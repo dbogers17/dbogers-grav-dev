@@ -256,3 +256,10 @@ Versies volgen SemVer: **major.minor.patch**.
 - Made suit coating, helmet module, visor spectrum, backpack system and identification lights visibly alter the preview.
 - Replaced arrow-only controls with direct labeled loadout selectors.
 - Added a cinematic Helix Station start scene with a ringed planet and animated ship traffic.
+
+## 0.13.3 - Menu Visual Consistency - 2026-08-01
+
+- Replaced abstract CSS triangles on the home screen with the actual Helix patrol, hauler and maintenance ship assets.
+- Fixed the Space Explorer title wrapping and orphaned final letter on wide displays.
+- Applied the cinematic station background and dark visual shell to Start, Load, Creator and Settings.
+- Added state-specific visual regression assertions for the complete pre-game menu flow.

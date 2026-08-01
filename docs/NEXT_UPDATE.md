@@ -1,3 +1,3 @@
-# Next update: v0.13.3 - Mission and Communication Systems
+# Next update: v0.13.4 - Browser Acceptance and Creator Polish
 
-Complete mission acceptance, rewards, NPC ship communication, trade and dedicated helmet-off face customization after v0.13.2 creator acceptance.
+Add screenshot-based browser acceptance tests, creator layer alignment refinements and load-slot previews after v0.13.3 acceptance.
