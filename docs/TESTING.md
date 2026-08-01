@@ -33,3 +33,14 @@
 - Minimap overlapt het flight dock niet.
 - Controls-paneel opent en sluit.
 - Layout blijft bruikbaar op 620px en 900px breedte.
+
+## v0.8.0 releasecontrole
+
+- Portal toont exact v0.8.0 en opent changelog op klik.
+- Galaxybadge opent lorevenster.
+- Stille cursor: schip blijft 30 seconden staan en start daarna autopilot.
+- Cursor buiten venster: rustige autopilot zonder sprong naar boven.
+- Menu toont opvallende EXIT TO SECRET LAB-knop.
+- Exit slaat op en opent `/secret-lab`.
+- Map vult het beschikbare scherm en ondersteunt wheel-zoom en drag-pan.
+- Instellingen blijven na refresh in saveversie 2 staan.

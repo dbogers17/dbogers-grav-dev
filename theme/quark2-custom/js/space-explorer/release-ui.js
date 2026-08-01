@@ -1,0 +1,25 @@
+import{loadSave,saveGame}from'./save-manager.js';
+const VERSION='0.8.0';
+const CHANGELOG=[
+ ['0.8.0','Living Sector','Autopilot timing corrected; interactive galaxy and release popups; exit flow; fullscreen map; audio, FPS and graphics settings; richer procedural sectors.'],
+ ['0.7.0','First Flight','Early Access HUD makeover, flight dock, controls panel, map shortcut and reliable panel closing.'],
+ ['0.6.0','Project Foundation','Unlock observer, release metadata, architecture, roadmap, test plan and changelog.'],
+ ['0.5.0','Navigation','World coordinates, minimap, large map, locations and Broken Beacon quest.'],
+ ['0.4.0','Shared Save','Portal and full game share ship, galaxy and settings.'],
+ ['0.1.0','Grav Integration','Portal mini-game and separate full-game route.']
+];
+const LORE={
+ 'azure-reach':['Azure Reach','The calm frontier','A young blue sector built around Helix Station. Its trade lanes look safe, but the Broken Signal suggests an older network is waking beneath the cobalt clouds.','Hidden signal: pilots report a silent object beyond North Gate when no navigation target is active.'],
+ 'crystal-void':['Crystal Void','Echoes in violet glass','Charged crystal fields bend scanners and preserve fragments of old transmissions.','Hidden signal: some crystals respond to repair beams.'],
+ 'red-forge':['Red Forge','Industry without mercy','Foundries, pirate relays and molten dust orbit a dim red star.','Hidden signal: a derelict freighter crosses the western belt.'],
+ 'ancient-horizon':['Ancient Horizon','The gatekeepers archive','Golden rings and deserted archives drift around a cold blue giant.','Hidden signal: three rings align in the correct order.'],
+ 'event-horizon':['Event Horizon','Where maps stop','A black-hole frontier with distorted starlight and unstable routes.','Hidden signal: the safest path is not the shortest path.']
+};
+function modal(title,body){let m=document.querySelector('#sl-info-modal');if(!m){m=document.createElement('div');m.id='sl-info-modal';m.innerHTML='<section><header><div><small>SPACE EXPLORER DATABASE</small><h2></h2></div><button type="button" data-info-close aria-label="Close">×</button></header><div class="sl-info-body"></div></section>';document.body.append(m);m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-info-close]'))m.hidden=true})}m.querySelector('h2').textContent=title;m.querySelector('.sl-info-body').replaceChildren(body);m.hidden=false}
+function changelog(){const wrap=document.createElement('div');wrap.className='sl-release-list';for(const [v,n,d] of CHANGELOG){const item=document.createElement('article');item.innerHTML=`<b>v${v} · ${n}</b><p>${d}</p>`;wrap.append(item)}modal(`Release history · v${VERSION}`,wrap)}
+function galaxy(){const s=loadSave(),l=LORE[s.galaxy]||LORE['azure-reach'],wrap=document.createElement('div');wrap.className='sl-lore';wrap.innerHTML=`<p class="sl-lore-sub">${l[1]}</p><p>${l[2]}</p><aside>${l[3]}</aside><p><small>Current ship: ${s.ship} · Shield ${s.shield} · Hull ${s.hull}</small></p>`;modal(l[0],wrap)}
+function exitGame(){const wrap=document.createElement('div');wrap.innerHTML='<p>Your current position and game state will be saved before leaving.</p>';const row=document.createElement('div');row.className='sl-confirm-row';const cancel=document.createElement('button');cancel.textContent='Stay in game';cancel.dataset.infoClose='';const exit=document.createElement('button');exit.className='sl-danger';exit.textContent='SAVE & EXIT TO SECRET LAB';exit.onclick=()=>{saveGame(loadSave());location.href='/secret-lab'};row.append(cancel,exit);wrap.append(row);modal('Exit Space Explorer?',wrap)}
+function wire(){document.querySelectorAll('.sl-game-version,[data-space-version],#sl-version-button').forEach(e=>{e.tabIndex=0;e.setAttribute('role','button');e.title='View release history';e.onclick=changelog;e.onkeydown=x=>{if(x.key==='Enter'||x.key===' '){x.preventDefault();changelog()}}});document.querySelectorAll('#sl-mini-location,#sl-space-galaxy').forEach(e=>{e.tabIndex=0;e.setAttribute('role','button');e.title='View galaxy information';e.onclick=galaxy});
+ if(document.querySelector('#sl-space-app')){const menu=document.querySelector('#sl-space-menu');menu?.addEventListener('click',()=>setTimeout(()=>{const p=document.querySelector('#sl-space-panel');if(!p||p.querySelector('#sl-exit-game'))return;const b=document.createElement('button');b.id='sl-exit-game';b.className='sl-danger sl-exit';b.textContent='EXIT TO SECRET LAB';b.onclick=exitGame;p.append(b)},0));const dock=document.querySelector('#sl-flight-dock');if(dock&&!dock.querySelector('#sl-version-button')){const b=document.createElement('button');b.id='sl-version-button';b.textContent=`v${VERSION}`;b.onclick=changelog;dock.querySelector('.sl-flight-readouts')?.prepend(b)}}}
+addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.querySelector('#sl-info-modal');if(m&&!m.hidden){m.hidden=true;e.stopImmediatePropagation()}}});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();

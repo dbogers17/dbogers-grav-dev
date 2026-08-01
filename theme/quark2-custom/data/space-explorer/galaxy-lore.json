@@ -1,0 +1,7 @@
+{
+  "azure-reach":{"name":"Azure Reach","subtitle":"The calm frontier","story":"A young blue sector built around Helix Station. Its trade lanes look safe, but the Broken Signal suggests an older network is waking beneath the cobalt clouds.","hint":"Pilots report a silent object beyond North Gate that appears only when no navigation target is active."},
+  "crystal-void":{"name":"Crystal Void","subtitle":"Echoes in violet glass","story":"Charged crystal fields bend scanners and preserve fragments of old transmissions. Salvagers disappear when the violet storms begin to sing.","hint":"Some crystals respond to repair beams rather than mining lasers."},
+  "red-forge":{"name":"Red Forge","subtitle":"Industry without mercy","story":"Foundries, pirate relays and molten dust orbit a dim red star. Every contract has a price and every faction remembers unpaid debts.","hint":"A derelict freighter crosses the western belt on an irregular cycle."},
+  "ancient-horizon":{"name":"Ancient Horizon","subtitle":"The gatekeepers' archive","story":"Golden rings and deserted archives drift around a cold blue giant. The sector may contain the route used by the signal's original builders.","hint":"Three inactive rings align when visited in the correct order."},
+  "event-horizon":{"name":"Event Horizon","subtitle":"Where maps stop","story":"A black-hole frontier with distorted starlight and unstable routes. Only upgraded ships can survive the final approach.","hint":"The safest path is not the shortest path."}
+}

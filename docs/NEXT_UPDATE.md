@@ -1,12 +1,9 @@
-# Volgende update: v0.8.0 - Living Sector
+# Volgende update: v0.9.0 - Worlds and Stations
 
-Gepland:
-
-1. Zichtbare planeten, stations, asteroïdenvelden en warpgates in de speelwereld.
-2. Navigatielijn en targetindicator voor gekozen maplocaties.
-3. Docking bij Helix Station.
-4. Eenvoudige NPC-dialogen en questlog.
-5. Eerste mining- en salvageactiviteit.
-6. Prestatieprofielen en automatisch reduceren van effecten op tragere apparaten.
-
-De speler test vooral bediening, leesbaarheid, prestaties en of locaties logisch bereikbaar zijn.
+1. Zichtbare planeten met atmosfeer en schaduwzijde.
+2. Helix Station met docking, NPC-dialogen en questlog.
+3. Asteroïdenvelden met eerste miningactiviteit.
+4. Navigatielijn en off-screen targetindicator.
+5. Kleine passerende NPC-schepen en verkeersroutes.
+6. Sector-specifieke ambient audio zonder autoplayproblemen.
+7. Automatische performance fallback bij lage framerate.

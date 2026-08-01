@@ -135,3 +135,6 @@ body.secret-lab-portal-page .secret-lab-filters{z-index:60!important}
 /* Release metadata v0.6.0 */
 .sl-game-version{padding:.38rem .55rem;border:1px solid rgba(148,163,184,.2);border-radius:999px;background:rgba(2,8,20,.7);color:#7f94af;font-size:.62rem;letter-spacing:.04em}
 body.secret-lab-space-page::after{content:'Space Explorer v0.6.0 · Development';position:fixed;left:1rem;top:5rem;z-index:30;color:#6f87a5;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+
+/* Living Sector release controls */
+.sl-game-version,#sl-mini-location{cursor:pointer;transition:border-color .18s ease,background .18s ease}.sl-game-version:hover,#sl-mini-location:hover{border-color:rgba(125,211,252,.55);background:rgba(7,28,58,.9)}

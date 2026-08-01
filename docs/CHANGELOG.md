@@ -44,3 +44,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Controls-paneel en sneltoets `M` voor de galaxy map.
 - Grote map, panelen, knoppen, minimap en questmelding visueel vernieuwd.
 - Responsieve layouts toegevoegd voor desktop, tablet en mobiel.
+
+## 0.8.0 - Living Sector - 2026-08-01
+
+- Portal-autopilot wacht 30 seconden bij een stille cursor en start direct wanneer de cursor het venster verlaat.
+- Cursorvolging versneld en plotselinge beweging naar boven gecorrigeerd.
+- Klikbare versiepopup met releasegeschiedenis.
+- Klikbare galaxyinformatie met verhaal en verborgen aanwijzingen.
+- Duidelijke save-and-exitknop in het gamemenu.
+- Fullscreen kaartmodus met zoom en pan.
+- Uitgebreide graphics-, FPS-, effecten-, audio- en accessibilityinstellingen.
+- Permanente projectrequirements toegevoegd.
