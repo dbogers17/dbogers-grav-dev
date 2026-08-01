@@ -1,28 +1,23 @@
 # Architectuur
 
-## Grav
+## Kernregel
 
-- `pages/06.secret-lab/12.space-explorer/`: Engelstalige Grav-route.
-- `theme/quark2-custom/templates/space-explorer.html.twig`: full-game shell.
-- `theme/quark2-custom/templates/partials/base.html.twig`: laadt assets alleen voor relevante bodyclasses.
+Gameplay, rendering en interface hebben gescheiden verantwoordelijkheden. UI gebruikt exact één controller en één actieve mode: `closed`, `menu`, `map`, `settings`, `audio`, `video`, `controls` of `info`.
 
-## Client
+Deze state-machine voorkomt dat map-layout blijft hangen wanneer Menu opent. Iedere overgang reset de panelclass en panelinhoud.
 
-- `mini-game.js`: start pas nadat `#secret-lab-content` zichtbaar is. De unlockstatus wordt met een MutationObserver gevolgd.
-- `full-game.js`: wereldcoördinaten, locaties, minimap, grote map, questtrigger en autosave.
-- `save-manager.js`: gedeelde, opgeschoonde en versieerbare save in localStorage.
-- `portal-refresh.css`: portal-lagen, transparantie, sticky categorieën en gameversie.
-- `full-game.css`: HUD, kaarten en panelen.
+## Modules
 
-## Lagen portal
+- `full-game.js`: wereld, beweging, locaties, questtrigger en rendering.
+- `ui-controller.js`: alle menu-, map-, settings-, lore-, release- en exitstates.
+- `mini-game.js`: Portal-rendering en schip.
+- `portal-info.js`: Portalversie en galaxyinformatie.
+- `save-manager.js`: valideert en bewaart saveversie 2.
 
-1. Dynamische galaxy-achtergrond
-2. Schip met gedeeltelijke transparantie
-3. Websitecontent, banners en kaarten
-4. Sticky categorieën, header en bediening
+## Open-source geleerde patronen
 
-## Save
-
-Sleutel: `secretLabSpaceSaveV2`.
-
-Belangrijkste velden: pilotName, galaxy, ship, shipColor, shield, hull, credits, points, kills, skills, discovered, quests en settings.
+- Eén gamecontroller beheert de hoofdloop en gamestate.
+- Menu, playing, paused en game-over zijn expliciete states.
+- Input, rendering en UI worden gescheiden.
+- Een fixed-timestep is later wenselijk voor consistente physics.
+- Nieuwe features worden niet meer als meerdere concurrerende eventlisteners bovenop oude menu's geplaatst.

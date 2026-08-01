@@ -55,3 +55,15 @@ Versies volgen SemVer: **major.minor.patch**.
 - Fullscreen kaartmodus met zoom en pan.
 - Uitgebreide graphics-, FPS-, effecten-, audio- en accessibilityinstellingen.
 - Permanente projectrequirements toegevoegd.
+
+## 0.8.1 - Stabilization - 2026-08-01
+
+- Eén centrale UI-state-machine vervangt conflicterende menu-uitbreidingen.
+- Map en Menu kunnen elkaar niet meer in fullscreenstatus vasthouden.
+- Galaxyknop teruggebracht tot normale HUD-tekstgrootte.
+- Fullscreen map gebruikt één stabiele gameplay-overlay met zichtbare Close map-knop.
+- Settings verdeeld in Video, Audio en Controls-submenu's.
+- Exit teruggebracht tot normale menuknop met aparte bevestiging.
+- Objective en flight dock opnieuw uitgelijnd.
+- Portal Take Control verwijderd; galaxy, versie en Full game zijn gelijkvormig.
+- Portalversie gecorrigeerd naar v0.8.1 met klikbare releasegeschiedenis.

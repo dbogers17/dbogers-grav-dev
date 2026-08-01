@@ -44,3 +44,15 @@
 - Exit slaat op en opent `/secret-lab`.
 - Map vult het beschikbare scherm en ondersteunt wheel-zoom en drag-pan.
 - Instellingen blijven na refresh in saveversie 2 staan.
+
+## v0.8.1 stabiliteitscontrole
+
+- Portal heeft alleen Azure Reach, v0.8.1 en Full game; alle drie dezelfde hoogte.
+- Azure Reach en v0.8.1 openen een popup.
+- Menu is nooit fullscreen.
+- Map opent groot maar met marges en een zichtbare Close map-knop.
+- Eerst Map, daarna Menu levert een normaal menu op.
+- Eerst Menu, daarna Map levert alleen de map op.
+- Settings bevat Video, Audio en Controls.
+- Exit is een normale knop; bevestiging toont Save & exit.
+- Objective overlapt flight dock niet.

@@ -51,3 +51,21 @@ body.secret-lab-space-page{background:#01040b;color:#e5f3ff}
 .sl-game-version,#sl-mini-location,#sl-space-galaxy{cursor:pointer}
 #sl-space-panel.sl-full-map-panel{inset:5.5rem 1rem 1rem!important;width:auto!important;max-height:none!important}
 #sl-space-panel.sl-full-map-panel .sl-map{height:calc(100vh - 11rem)!important;min-height:520px;cursor:grab}
+
+/* v0.8.1 UI stabilization. These rules intentionally override v0.7/v0.8 extensions. */
+#sl-space-galaxy{display:inline!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;color:#e5f3ff!important;text-align:left!important;width:auto!important;min-width:0!important;cursor:pointer}
+#sl-space-panel{inset:auto 1rem 1rem auto!important;top:5.5rem!important;width:min(520px,calc(100% - 2rem))!important;height:auto!important;max-height:calc(100vh - 7rem)!important;overflow:auto!important;padding:1rem!important}
+#sl-space-panel.sl-mode-map{inset:5.5rem 1rem 1rem!important;width:auto!important;height:auto!important;max-height:none!important;overflow:hidden!important}
+#sl-space-panel.sl-mode-closed{display:none!important}
+.sl-panel-head{position:sticky;top:-1rem;z-index:4;background:#071a36;padding:.8rem 0!important}
+.sl-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.sl-menu-grid button,.sl-back,.sl-map-close{width:auto!important;min-height:42px!important;margin:0!important}
+.sl-exit-normal{border-color:rgba(248,113,113,.42)!important;background:#37141b!important;color:#fecaca!important}
+.sl-settings-list{display:grid;gap:.55rem;margin-bottom:.8rem}.sl-setting-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem .75rem;border:1px solid rgba(125,211,252,.12);border-radius:9px;background:rgba(8,29,58,.45)}.sl-setting-row select,.sl-setting-row input{width:min(220px,48%)}
+.sl-stable-map{position:relative;height:calc(100vh - 12.8rem);min-height:440px;overflow:hidden;border:1px solid rgba(125,211,252,.2);border-radius:12px;background:radial-gradient(circle at 50% 50%,rgba(30,96,155,.42),rgba(4,18,39,.95) 48%,#01050e 100%)}
+.sl-map-grid{position:absolute;inset:0;opacity:.22;background-image:linear-gradient(rgba(125,211,252,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,.12) 1px,transparent 1px);background-size:64px 64px}
+.sl-stable-map button,.sl-you{position:absolute!important;transform:translate(-50%,-50%);width:auto!important;min-height:36px!important;z-index:2}.sl-you{padding:.25rem .45rem;border-radius:999px;background:#fff;color:#071a36;font-size:.65rem;font-weight:800}.sl-map-close{margin-top:.7rem!important}
+#sl-space-objective{bottom:5.8rem!important;z-index:22!important}#sl-flight-dock{bottom:1rem!important;min-height:54px!important}#sl-flight-dock #sl-version-button{display:none!important}
+#sl-exit-game{width:auto!important;display:inline-flex!important;margin:.25rem!important;font-weight:600!important;letter-spacing:0!important}
+#sl-settings-advanced{display:none!important}
+@media(max-width:650px){.sl-menu-grid{grid-template-columns:1fr}.sl-stable-map{height:calc(100vh - 15rem);min-height:360px}}
