@@ -216,3 +216,12 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added cached integer-aligned Helix rendering to reduce shimmer and blur during camera movement.
 - Added exclusion space around large planets and reduced overlapping celestial clutter.
 - Improved the start panel and separated its visual hierarchy from the active flight HUD.
+
+## 0.12.6 - Runtime Consolidation - 2026-08-01
+
+- Removed obsolete renderer instances from the active world pipeline.
+- Stopped mutating static Azure Reach content with runtime traffic state.
+- Connected TrafficSystem directly to the single active RenderSystem.
+- Isolated start, save and creator screens from active world rendering.
+- Split planetary rings into rear and front passes.
+- Consolidated asteroid, planet, traffic, station and background draw order.
