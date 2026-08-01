@@ -1,0 +1,2 @@
+const BASE='/user/themes/quark2-custom/assets/space-explorer/helix-v2/';
+export class HelixV2Assets{constructor(){this.cache=new Map()}load(path){if(this.cache.has(path))return this.cache.get(path);const image=new Image(),a={image,ready:false};image.onload=()=>a.ready=true;image.src=BASE+path;this.cache.set(path,a);return a}draw(ctx,path,x,y,w,h,angle=0){const a=this.load(path);if(!a.ready)return false;ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(angle);ctx.imageSmoothingEnabled=true;ctx.drawImage(a.image,-w/2,-h/2,w,h);ctx.restore();return true}}

@@ -225,3 +225,15 @@ Versies volgen SemVer: **major.minor.patch**.
 - Isolated start, save and creator screens from active world rendering.
 - Split planetary rings into rear and front passes.
 - Consolidated asteroid, planet, traffic, station and background draw order.
+
+## 0.13.0 - Clean Runtime Rebuild - 2026-08-01
+
+- Split generated art atlases into individual transparent runtime assets.
+- Replaced Suit Type with Skill Type and added role explanations and starting bonuses.
+- Preserved explorer name while changing creator options.
+- Replaced the player ship, NPC ships, planet, creator and docking bay with individual faction assets.
+- Applied camera zoom to world positions and object sizes.
+- Added an in-flight destination route, edge arrow, distance, bearing and ETA.
+- Made the tactical map full-screen.
+- Replaced hard station bounce with soft collision damping.
+- Removed obsolete renderer files from the active runtime.

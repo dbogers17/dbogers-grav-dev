@@ -1,12 +1,5 @@
-export const EXPLORER_OPTIONS=Object.freeze({
- suitType:['Explorer','Engineer','Salvager','Pilot'],
- suitColor:['Azure','White','Orange','Green','Red','Violet','Graphite'],
- helmetStyle:['None','Standard','Compact','Reinforced','Surveyor'],
- visorColor:['Cyan','Gold','Blue','Violet','Dark'],
- backpack:['Compact','Utility','Repair','Survey'],
- accentColor:['White','Cyan','Orange','Green','Red']
-});
-export const DEFAULT_EXPLORER=Object.freeze({suitType:'Explorer',suitColor:'Azure',helmetStyle:'Standard',visorColor:'Cyan',backpack:'Utility',accentColor:'White'});
-export const COLORS=Object.freeze({Azure:'#2388d1',White:'#dbeafe',Orange:'#ea7b24',Green:'#2fa36b',Red:'#c94452',Violet:'#7c5bd6',Graphite:'#334155',Cyan:'#22d3ee',Gold:'#fbbf24',Blue:'#3b82f6',Dark:'#172033'});
-export function normalizeExplorer(value={}){const out={};for(const [key,values] of Object.entries(EXPLORER_OPTIONS))out[key]=values.includes(value[key])?value[key]:DEFAULT_EXPLORER[key];return out}
-export function randomExplorer(random=Math.random){const out={};for(const [key,values] of Object.entries(EXPLORER_OPTIONS))out[key]=values[Math.floor(random()*values.length)%values.length];return out}
+export const EXPLORER_OPTIONS=Object.freeze({skillType:['Explorer','Engineer','Salvager','Pilot'],suitColor:['Azure','Graphite','Ivory','Crimson','Amber'],helmetStyle:['None','Standard','Compact','Reinforced','Surveyor'],visorColor:['Cyan','Amber','Smoke','Emerald'],backpack:['Utility','Repair','Cargo','Flight'],accentColor:['White','Orange','Cyan','Gold']});
+export const DEFAULT_EXPLORER=Object.freeze({skillType:'Explorer',suitColor:'Azure',helmetStyle:'Standard',visorColor:'Cyan',backpack:'Utility',accentColor:'White'});
+export const SKILL_INFO=Object.freeze({Explorer:{summary:'Balanced exploration specialist.',bonus:'Longer scan range and improved anomaly detection.',style:'Recommended for discovery and story missions.'},Engineer:{summary:'Ship systems and repair specialist.',bonus:'Lower repair costs and improved module efficiency.',style:'Recommended for support and technical play.'},Salvager:{summary:'Recovery and resource specialist.',bonus:'More salvage yield and improved cargo efficiency.',style:'Recommended for mining, wrecks and trading.'},Pilot:{summary:'High-performance flight specialist.',bonus:'Better acceleration, turning and boost economy.',style:'Recommended for racing, escort and combat.'}});
+export function normalizeExplorer(value={}){const source=value&&typeof value==='object'?value:{};const migrated={...source,skillType:source.skillType||source.suitType||DEFAULT_EXPLORER.skillType};const out={};for(const[key,values]of Object.entries(EXPLORER_OPTIONS))out[key]=values.includes(migrated[key])?migrated[key]:DEFAULT_EXPLORER[key];return out}
+export function randomExplorer(){const out={};for(const[k,v]of Object.entries(EXPLORER_OPTIONS))out[k]=v[Math.floor(Math.random()*v.length)];return out}
