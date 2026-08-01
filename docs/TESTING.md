@@ -24,3 +24,12 @@
 - Geen game-assets op andere websitepagina's.
 - Geen JavaScriptfouten in de browserconsole.
 - Cache legen na iedere Twig-, CSS- of JS-update.
+
+## v0.7.0 releasecontrole
+
+- Alle HUD-vakken hebben dezelfde hoogte.
+- Close, Escape en Resume sluiten panelen.
+- `M` opent de galaxy map.
+- Minimap overlapt het flight dock niet.
+- Controls-paneel opent en sluit.
+- Layout blijft bruikbaar op 620px en 900px breedte.

@@ -34,3 +34,13 @@ Versies volgen SemVer: **major.minor.patch**.
 ## 0.1.0 - 2026-08-01
 
 - Eerste Grav-integratie met mini-game en aparte full-game route.
+
+## 0.7.0 - First Flight - 2026-08-01
+
+- Eerste grote Early Access UI-make-over.
+- HUD-elementen gelijkgetrokken en acties meer ruimte gegeven.
+- Betrouwbare globale close-afhandeling voor menu's, maps en dialogen.
+- Flight dock met versie, thruststatus en navigatiestatus.
+- Controls-paneel en sneltoets `M` voor de galaxy map.
+- Grote map, panelen, knoppen, minimap en questmelding visueel vernieuwd.
+- Responsieve layouts toegevoegd voor desktop, tablet en mobiel.
