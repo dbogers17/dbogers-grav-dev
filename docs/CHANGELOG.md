@@ -121,3 +121,9 @@ Versies volgen SemVer: **major.minor.patch**.
 - Visible docking radius and proximity prompt: Press E to dock.
 - Docking requires proximity and low speed.
 - Asteroids receive stronger pseudo-3D lighting and shading.
+
+## 0.10.2 - Helix Approach Hotfix - 2026-08-01
+
+- Fixed the extra closing brace in `RenderSystem.js` that prevented the entire ES module graph from loading.
+- Added release-blocking syntax validation to the hotfix checks.
+- No gameplay or save data changes.

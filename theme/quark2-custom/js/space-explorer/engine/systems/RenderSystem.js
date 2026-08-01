@@ -27,5 +27,4 @@ export class RenderSystem{
   for(const r of this.rocks){const q=camera.worldToScreen(r.x,r.y,w,h,1);if(q.x<-30||q.x>w+30||q.y<-30||q.y>h+30)continue;c.save();c.translate(q.x,q.y);c.rotate(r.a);const g=c.createLinearGradient(-r.r,-r.r,r.r,r.r);g.addColorStop(0,'#718096');g.addColorStop(.42,'#37465c');g.addColorStop(1,'#111827');c.fillStyle=g;c.strokeStyle='#8796aa';c.beginPath();for(let j=0;j<7;j++){const a=j/7*Math.PI*2,rr=r.r*(.75+((j*37)%5)/12);c.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}c.closePath();c.fill();c.stroke();c.restore()}
   for(const loc of this.world.locations){const q=camera.worldToScreen(loc.x,loc.y,w,h,1);if(q.x<-280||q.x>w+280||q.y<-280||q.y>h+280)continue;if(loc.type==='station'){this.drawStation(c,q,loc,time);continue}c.strokeStyle=loc.type==='quest'?'#fbbf24':'#60a5fa';c.lineWidth=2;c.beginPath();c.arc(q.x,q.y,13,0,Math.PI*2);c.stroke();c.fillStyle='#dbeafe';c.font='12px sans-serif';c.textAlign='center';c.fillText(loc.name,q.x,q.y+38)}
  }
- }
 }

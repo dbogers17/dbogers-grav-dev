@@ -6,3 +6,7 @@
 - The first map is informational; navigation target selection returns in v0.9.1.
 - Multiplayer is not active; only architectural boundaries are prepared.
 - Portal mini-game still uses the older renderer and will migrate after the full engine stabilizes.
+
+## Resolved in v0.10.2
+
+- v0.10.1 rendered a black screen because `RenderSystem.js` contained one extra closing brace and failed module parsing.
