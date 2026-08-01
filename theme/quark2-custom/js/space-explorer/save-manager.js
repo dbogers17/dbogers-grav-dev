@@ -1,5 +1,8 @@
-const KEY='secretLabSpaceSaveV1';
-const defaults={version:1,pilotName:'Pilot',galaxy:'azure-reach',ship:'kestrel',x:0,y:0,shield:100,hull:100,credits:0,discovered:['azure-reach'],quests:{main:'broken-signal',side:[]},settings:{graphics:'auto',master:.8,effects:.8,music:.6}};
-export function loadSave(){try{return{...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return structuredClone(defaults)}}
-export function saveGame(data){localStorage.setItem(KEY,JSON.stringify({...data,savedAt:Date.now()}));document.cookie='sl_save=1;path=/;max-age=31536000;SameSite=Lax'}
-export function deleteSave(){localStorage.removeItem(KEY)}
+const KEY='secretLabSpaceSaveV2';
+const LEGACY='secretLabSpaceSaveV1';
+export const defaults={version:2,pilotName:'Pilot',galaxy:'azure-reach',ship:'kestrel',shipColor:'#7dd3fc',x:0,y:0,shield:100,hull:100,credits:0,points:0,kills:0,skills:{flight:1,combat:1,trade:1},discovered:['azure-reach'],quests:{main:'broken-signal',stage:0,side:[]},settings:{graphics:'auto',master:.8,effects:.8,music:.6,reducedMotion:false}};
+function clean(v){const d=structuredClone(defaults),s=v&&typeof v==='object'?v:{};return{...d,...s,version:2,pilotName:String(s.pilotName||d.pilotName).slice(0,16),galaxy:String(s.galaxy||d.galaxy),ship:String(s.ship||d.ship),shipColor:/^#[0-9a-f]{6}$/i.test(s.shipColor||'')?s.shipColor:d.shipColor,shield:Math.max(0,Math.min(200,Number(s.shield??d.shield))),hull:Math.max(0,Math.min(200,Number(s.hull??d.hull))),credits:Math.max(0,Number(s.credits||0)),points:Math.max(0,Number(s.points||0)),kills:Math.max(0,Number(s.kills||0)),skills:{...d.skills,...s.skills},quests:{...d.quests,...s.quests},settings:{...d.settings,...s.settings},discovered:Array.isArray(s.discovered)?s.discovered.slice(0,12):d.discovered};}
+export function loadSave(){try{const raw=localStorage.getItem(KEY)||localStorage.getItem(LEGACY);return clean(raw?JSON.parse(raw):null)}catch{return structuredClone(defaults)}}
+export function saveGame(data){const safe=clean(data);localStorage.setItem(KEY,JSON.stringify({...safe,savedAt:Date.now()}));document.cookie='sl_save=1;path=/;max-age=31536000;SameSite=Lax';window.dispatchEvent(new CustomEvent('sl-save-updated',{detail:safe}));return safe}
+export function deleteSave(){localStorage.removeItem(KEY);localStorage.removeItem(LEGACY)}
+export const SAVE_KEY=KEY;
