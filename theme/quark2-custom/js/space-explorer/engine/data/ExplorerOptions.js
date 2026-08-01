@@ -1,7 +1,7 @@
 export const EXPLORER_OPTIONS=Object.freeze({
  suitType:['Explorer','Engineer','Salvager','Pilot'],
  suitColor:['Azure','White','Orange','Green','Red','Violet','Graphite'],
- helmetStyle:['Standard','Compact','Reinforced','Surveyor'],
+ helmetStyle:['None','Standard','Compact','Reinforced','Surveyor'],
  visorColor:['Cyan','Gold','Blue','Violet','Dark'],
  backpack:['Compact','Utility','Repair','Survey'],
  accentColor:['White','Cyan','Orange','Green','Red']

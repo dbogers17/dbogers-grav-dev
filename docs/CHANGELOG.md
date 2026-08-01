@@ -205,3 +205,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Fixed background object distribution to avoid vertical streak-like formations.
 - Added stable integer-aligned station rendering to reduce texture shimmer while moving.
 - Replaced the old map markup with an interactive tactical grid canvas with pan, zoom and coordinates.
+
+## 0.12.5 - Integration Recovery - 2026-08-01
+
+- Replaced the active legacy map branch with the interactive tactical canvas.
+- Added map pan, wheel zoom, toolbar zoom, centering, coordinates, traffic, asteroids and double-click destinations.
+- Added in-flight camera zoom from 70% to 160% with mouse wheel and Home reset.
+- Replaced the active character preview with faction atlas artwork and added Helmet: None.
+- Connected live TrafficSystem positions to visible faction ship sprites.
+- Added cached integer-aligned Helix rendering to reduce shimmer and blur during camera movement.
+- Added exclusion space around large planets and reduced overlapping celestial clutter.
+- Improved the start panel and separated its visual hierarchy from the active flight HUD.

@@ -1,7 +1,7 @@
-# Next update: v0.13.0 - Combat, Markets and Faction Expansion
+# Next update: v0.13.0 - Asteroid Art, Pilot Identity and Playable Navigation
 
-1. Split atlas regions into optimized individual sprites and animate engines and lights.
-2. Add pirate, frontier, corporate and independent faction asset sets.
-3. Add targeting, weapons, projectiles, wrecks and salvage.
-4. Make trade, repair, equipment and mission interfaces fully interactive.
-5. Add tactical-map layers for traffic, hazards, factions and mission routes.
+1. Add individual high-resolution asteroid material sprites and background clusters.
+2. Add face, hair and helmet-off pilot portraits and save data.
+3. Add visible in-flight edge arrow, destination marker and route line.
+4. Add station docking ports with arrival and departure traffic behavior.
+5. Add combat, salvage, interactive markets and first pirate faction encounter.
