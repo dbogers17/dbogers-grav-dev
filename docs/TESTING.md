@@ -122,3 +122,12 @@
 - Return to Ship and Escape undock at the safe spawn point.
 - Autosave remains active while inside the station.
 - Map, Menu and Station never render simultaneously.
+
+## v0.11.4 acceptance tests
+
+- Cruise and diagonal thrust remain at or below 500 u/s.
+- Shift produces BOOST, speeds above 500, purple dual-engine exhaust and energy drain.
+- Releasing Shift produces COAST and returns to 500 within several seconds even while W remains held.
+- Ship has visible layered hull, cockpit, wings, two engines, navigation lights and shield volume.
+- Asteroids have irregular silhouettes, directional shading, shadows and craters.
+- Station shops have raised shells, counters, vents, shadows, lights and recognizable NPC bodies.

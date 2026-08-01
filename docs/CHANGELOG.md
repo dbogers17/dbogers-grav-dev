@@ -153,3 +153,11 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added an explicit Node.js 20+ release requirement.
 - Updated smoke tests to avoid legacy parser incompatibilities.
 - Preserved and revalidated the v0.11.1 UIManager syntax repair.
+
+## 0.11.4 - Visual Flight Systems - 2026-08-01
+
+- Replaced the failed v0.11.3 coast model with a decreasing total-speed ceiling that cannot be offset by held thrust.
+- Added deterministic tests for cruise, diagonal thrust, boost and coast-down.
+- Redesigned the player ship with layered hull shading, wings, cockpit glass, navigation lights, dual engines and shield volume.
+- Redesigned asteroids with irregular silhouettes, directional lighting, shadows and crater layers.
+- Increased Station Hub depth with raised shop shells, vents, illuminated counters, shadows and more character-like NPC sprites.

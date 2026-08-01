@@ -1,8 +1,7 @@
-# Next update: v0.11.1 - Station Polish
+# Next update: v0.11.5 - Art and Interaction Pass
 
-1. Add animated doors and clearer collision boundaries.
-2. Add shop inventory panels and credit prices.
-3. Add station NPC names, portraits and dialogue choices.
-4. Add station-specific visual variants for future sectors.
-5. Add ship preview and docking bay animation.
-6. Run live regression checks before Save Service work continues.
+1. Evaluate v0.11.4 live against the supplied visual references.
+2. Add station props, machinery, crates, doors and a visible docked ship.
+3. Add shop windows with credits, inventory and prices.
+4. Add object selection rings and conditional health bars.
+5. Add asteroid size classes and resource interaction.
