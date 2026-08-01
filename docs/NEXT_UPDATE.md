@@ -1,7 +1,7 @@
-# Next update: v0.11.6 - Station Life and Space Debris
+# Next update: v0.13.0 - Combat, Salvage and Interactive Markets
 
-1. Add station machinery, pipes, doors, crates and visible docked ship.
-2. Add decorative wrecks and debris fields.
-3. Add background asteroid parallax layers and distant silhouettes.
-4. Make map destinations clickable and connect them to flight navigation.
-5. Add first trade, repair and mission interface panels.
+1. Target selection, projectiles, weapons and conditional health bars.
+2. Disabled ships, decorative and interactive wrecks, salvage collection.
+3. Functional trade, equipment, repair and mission panels.
+4. Connect tactical map destination selection to in-flight HUD route marker.
+5. Add first hostile pirate encounter and escort contract.

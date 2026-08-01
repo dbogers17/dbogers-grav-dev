@@ -141,3 +141,12 @@
 - At least five traffic ships move around the safe sector.
 - Asteroids cover several broad regions while leaving safe space around Helix.
 - Map identifies station, outposts, mission, field, gate, safe zone and route.
+
+## v0.12.2 acceptance tests
+
+- Industrial traffic classes use distinct roles and waypoint routes rather than circular motion.
+- Inventory respects cargo capacity; trade changes item amounts and credits.
+- Mission state persists and advances through objectives.
+- Navigation calculates distance, bearing and ETA and persists the destination.
+- Tactical map supports pan, zoom, grid and coordinate conversion.
+- Background is substantially darker and includes parallax asteroid silhouettes.

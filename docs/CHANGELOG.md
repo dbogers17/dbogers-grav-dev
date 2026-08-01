@@ -172,3 +172,15 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added Azure Relay and Cobalt Mining Post.
 - Expanded deterministic asteroid generation to four large clusters with varied sizes.
 - Rebuilt the galaxy map with object types, safe zone, route line, selected destination, distance, threat and legend.
+
+## 0.12.2 - Industrial Universe Vertical Slice - 2026-08-01
+
+- Added original industrial rendering foundation for distinct hauler, miner, vendor, patrol and maintenance silhouettes.
+- Rebuilt Helix data as a large functional hub with outposts, routes and broader asteroid regions.
+- Added deterministic NPC traffic waypoints instead of circular orbit motion.
+- Added dark-space palette and background asteroid parallax layer.
+- Added credits, cargo capacity, inventory items, prices and ship upgrade definitions.
+- Added main-story and repeatable contract data with serializable mission progress.
+- Added persistent navigation destination, bearing, distance and ETA HUD summary.
+- Added interactive tactical-map engine with pan, zoom, coordinates, grid, object selection and double-click destination support.
+- Added multiple-galaxy data foundation and authoritative multiplayer architecture documentation.
