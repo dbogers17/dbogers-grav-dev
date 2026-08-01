@@ -10,3 +10,7 @@
 ## Resolved in v0.10.2
 
 - v0.10.1 rendered a black screen because `RenderSystem.js` contained one extra closing brace and failed module parsing.
+
+## Resolved in v0.11.1
+
+- v0.11.0 failed with `Unexpected token '{'` because `UIManager.render()` was not closed before `setDockPrompt()`.

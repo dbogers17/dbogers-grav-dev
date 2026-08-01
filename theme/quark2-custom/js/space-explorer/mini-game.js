@@ -1,5 +1,5 @@
 import{loadSave,SAVE_KEY}from'./save-manager.js';
-const VERSION='0.9.1';
+const VERSION='0.11.2';
 let started=false;
 function unlocked(){const locked=document.querySelector('#secret-lab-locked'),content=document.querySelector('#secret-lab-content');return !!content&&!content.hidden&&(!locked||locked.hidden||getComputedStyle(locked).display==='none')}
 function start(){if(started||!document.body.classList.contains('secret-lab-portal-page')||!unlocked())return;started=true;

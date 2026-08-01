@@ -138,3 +138,18 @@ Versies volgen SemVer: **major.minor.patch**.
 - Industrial station art direction with tiled floors, walls, corridors, cyan lights, crates, central reactor and shop counters.
 - Return to Ship and Escape safely undock beside Helix Station.
 - Station scene remains isolated from Flight, Map and Menu states.
+
+## 0.11.1 - Station Hub Hotfix - 2026-08-01
+
+- Fixed the missing closing brace in `UIManager.render()` that prevented the engine from loading.
+- Added a mandatory local release validator for every Space Explorer JavaScript module.
+- Added import validation, version consistency checks, required-module checks and legacy-runtime detection.
+- Added GitHub Actions validation for every relevant push and pull request.
+- No save data or gameplay changes.
+
+## 0.11.2 - Validator Compatibility Hotfix - 2026-08-01
+
+- Marked the engine directory as an ES module package for Node validation.
+- Added an explicit Node.js 20+ release requirement.
+- Updated smoke tests to avoid legacy parser incompatibilities.
+- Preserved and revalidated the v0.11.1 UIManager syntax repair.
