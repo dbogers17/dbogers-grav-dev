@@ -1,3 +1,3 @@
-# Next update: v0.13.2 - Missions and Communications
+# Next update: v0.13.3 - Mission and Communication Systems
 
-Add complete mission acceptance and reward flow, NPC ship communications, trade interactions, dedicated side/back character art and additional faction stations after v0.13.1 acceptance.
+Complete mission acceptance, rewards, NPC ship communication, trade and dedicated helmet-off face customization after v0.13.2 creator acceptance.

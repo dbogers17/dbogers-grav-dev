@@ -248,3 +248,11 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added a flight minimap with stations, traffic, asteroids and destination.
 - Rendered outposts and relays as scaled physical station modules instead of dots.
 - Added SHA-256 release integrity verification.
+
+## 0.13.2 - Pilot Creator Rebuild - 2026-08-01
+
+- Replaced the previous creator renderer and creator layout instead of patching it.
+- Added twelve dedicated pilot view assets: four skills with Front, Side and Back views.
+- Made suit coating, helmet module, visor spectrum, backpack system and identification lights visibly alter the preview.
+- Replaced arrow-only controls with direct labeled loadout selectors.
+- Added a cinematic Helix Station start scene with a ringed planet and animated ship traffic.
