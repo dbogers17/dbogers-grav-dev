@@ -1,0 +1,1 @@
+export class EventBus{#events=new Map();on(name,handler){if(typeof handler!=='function')throw new TypeError('handler');const set=this.#events.get(name)||new Set();set.add(handler);this.#events.set(name,set);return()=>set.delete(handler)}emit(name,payload){for(const fn of this.#events.get(name)||[])fn(payload)}clear(){this.#events.clear()}}

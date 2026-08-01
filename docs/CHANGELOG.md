@@ -67,3 +67,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Objective en flight dock opnieuw uitgelijnd.
 - Portal Take Control verwijderd; galaxy, versie en Full game zijn gelijkvormig.
 - Portalversie gecorrigeerd naar v0.8.1 met klikbare releasegeschiedenis.
+
+## 0.9.0 - Engine Foundation - 2026-08-01
+
+- Full game replaced by a modular ES6 Canvas engine.
+- Fixed-timestep game loop, explicit state machine, central input manager, smooth camera and event bus.
+- New English-only start screen: New Game, Continue and Settings.
+- One UI manager owns Flight, Menu, Map and Settings states.
+- Safe Azure Reach start sector with Neris, Helix Station and nearby points of interest.
+- New save version 3; development progress intentionally resets.
+- Node smoke tests added for state transitions and save validation.
+- Legacy full-game scripts removed from asset registration.

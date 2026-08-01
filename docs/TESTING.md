@@ -56,3 +56,15 @@
 - Settings bevat Video, Audio en Controls.
 - Exit is een normale knop; bevestiging toont Save & exit.
 - Objective overlapt flight dock niet.
+
+## v0.9.0 acceptance tests
+
+- Only `engine/main.js` is loaded for the full game.
+- Start screen shows New Game, Continue and Settings in English.
+- New Game enters Flight and resets save version 3.
+- WASD movement has light inertia and the camera follows smoothly.
+- Menu, Map and Settings are mutually exclusive states.
+- Escape closes Menu, Map and Settings.
+- Map and Menu buttons always respond once.
+- Exit saves and returns to `/secret-lab`.
+- Invalid save values are clamped by SaveSystem.

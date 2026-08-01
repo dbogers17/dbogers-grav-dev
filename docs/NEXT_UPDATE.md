@@ -1,10 +1,9 @@
-# Volgende update: v0.9.0 - Worlds and Stations
+# Next update: v0.9.1 - Verification and Navigation
 
-v0.9.0 start pas nadat v0.8.1 zonder UI-regressies is getest.
+1. Verify all v0.9.0 states live and fix regressions.
+2. Restore clickable navigation targets on the map.
+3. Add a minimap owned by the engine UI.
+4. Add settings persistence and proper release notes.
+5. Add automated browser tests when Node is available on the dev server.
 
-1. Planeten en sterren met galaxy-specifieke rendering.
-2. Helix Station docking en NPC-dialoog.
-3. Navigatielijn en targetindicator.
-4. Asteroïdenvelden en mining.
-5. NPC-schepen en verkeersroutes.
-6. Fixed-timestep physics en centraal inputbeheer.
+Questions after testing: Does movement feel responsive enough? Is camera smoothing comfortable? Should the start screen emphasize Continue or New Game during development?
