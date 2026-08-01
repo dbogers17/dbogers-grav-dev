@@ -127,3 +127,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Fixed the extra closing brace in `RenderSystem.js` that prevented the entire ES module graph from loading.
 - Added release-blocking syntax validation to the hotfix checks.
 - No gameplay or save data changes.
+
+## 0.11.0 - Station Hub - 2026-08-01
+
+- Docking now enters a separate top-down Helix Station scene.
+- Simple explorer character moves with WASD.
+- E interacts with staff and terminals near shop counters.
+- Added Repair Workshop, Trade Market, Equipment Shop and Mission Terminal.
+- Repair Workshop immediately restores ship hull, shield and boost.
+- Industrial station art direction with tiled floors, walls, corridors, cyan lights, crates, central reactor and shop counters.
+- Return to Ship and Escape safely undock beside Helix Station.
+- Station scene remains isolated from Flight, Map and Menu states.

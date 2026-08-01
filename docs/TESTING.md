@@ -112,3 +112,13 @@
 - Dock prompt appears inside the radius and disappears outside it.
 - E docks only while nearby and below 55 u/s.
 - Helix Station has visible rings, hub, dock arm, shield glow and animated lights.
+
+## v0.11.0 acceptance tests
+
+- Docking enters Station state and no Flight controls continue in the background.
+- WASD moves the explorer marker and walls block movement.
+- E near each counter triggers only that shop or NPC.
+- Repair Workshop restores hull, shield and boost.
+- Return to Ship and Escape undock at the safe spawn point.
+- Autosave remains active while inside the station.
+- Map, Menu and Station never render simultaneously.
