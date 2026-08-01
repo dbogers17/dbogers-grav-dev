@@ -1,17 +1,13 @@
+import{AssetManager}from'../art/AssetManager.js';
+import{HelixStationRenderer}from'../art/HelixStationRenderer.js';
+import{InfiniteSpaceRenderer}from'../art/InfiniteSpaceRenderer.js';
 import{IndustrialRenderer}from'../art/IndustrialRenderer.js';
 import{StationRenderer}from'../art/StationRenderer.js';
 import{TrafficRenderer}from'../art/TrafficRenderer.js';
 export class RenderSystem{
- constructor(ctx,world){this.ctx=ctx;this.world=world;this.industrial=new IndustrialRenderer();this.stationRenderer=new StationRenderer();this.trafficRenderer=new TrafficRenderer();this.stars=Array.from({length:620},(_,i)=>({x:(i*977)%world.size-world.size/2,y:(i*613)%world.size-world.size/2,z:.18+(i%17)/18,p:i*.37,c:i%7}));this.dust=Array.from({length:70},(_,i)=>({x:(i*431)%world.size-world.size/2,y:(i*271)%world.size-world.size/2,r:8+(i%9)*6,a:.025+(i%4)*.012}));this.rocks=world.asteroids.map((r,i)=>({...r,a:i*.8}));}
- drawBackground(camera,w,h,time){const c=this.ctx;
-  const base=c.createLinearGradient(0,0,w,h);base.addColorStop(0,'#010102');base.addColorStop(.48,'#080706');base.addColorStop(1,'#100b09');c.fillStyle=base;c.fillRect(0,0,w,h);
-  const nebula=(x,y,r,inner,alpha)=>{const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,inner);g.addColorStop(.45,inner.replace(/[^,]+\)$/,'0.18)'));g.addColorStop(1,'transparent');c.globalAlpha=alpha;c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2)};
-  nebula(w*.22+Math.sin(time*.00008)*35,h*.32,Math.max(w,h)*.48,'rgba(24,104,190,.34)',1);nebula(w*.78,h*.72+Math.cos(time*.00007)*24,Math.max(w,h)*.42,'rgba(74,38,150,.22)',1);c.globalAlpha=1;
-  for(const d of this.dust){const p=camera.worldToScreen(d.x,d.y,w,h,.08);if(p.x<-d.r||p.x>w+d.r||p.y<-d.r||p.y>h+d.r)continue;const g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,d.r*5);g.addColorStop(0,'rgba(48,128,210,.2)');g.addColorStop(1,'transparent');c.fillStyle=g;c.fillRect(p.x-d.r*5,p.y-d.r*5,d.r*10,d.r*10)}
-  for(const s of this.stars){const p=camera.worldToScreen(s.x,s.y,w,h,.12+s.z*.09);if(p.x<-6||p.x>w+6||p.y<-6||p.y>h+6)continue;const pulse=.45+.55*Math.sin(time*(s.c===0?.002:.0008)+s.p);c.globalAlpha=.18+s.z*.72*pulse;c.fillStyle=s.c===0?'#9ee7ff':s.c===1?'#ffd7a0':'#eef8ff';const size=Math.max(.55,s.z*2);c.beginPath();c.arc(p.x,p.y,size,0,Math.PI*2);c.fill();if(s.z>.88){c.globalAlpha*=.35;c.fillRect(p.x-5,p.y-.4,10,.8);c.fillRect(p.x-.4,p.y-5,.8,10)}}c.globalAlpha=1;
-  for(const a of this.world.background||[]){const p=camera.worldToScreen(a.x,a.y,w,h,a.depth);if(p.x<-30||p.x>w+30||p.y<-30||p.y>h+30)continue;c.globalAlpha=.18;c.fillStyle='#6b6257';c.beginPath();c.arc(p.x,p.y,a.r,0,Math.PI*2);c.fill()}c.globalAlpha=1;const sun=c.createRadialGradient(w*.86,h*.18,0,w*.86,h*.18,75);sun.addColorStop(0,'rgba(255,255,235,1)');sun.addColorStop(.12,'rgba(133,211,255,.9)');sun.addColorStop(.45,'rgba(45,119,225,.18)');sun.addColorStop(1,'transparent');c.fillStyle=sun;c.fillRect(w*.86-75,h*.18-75,150,150);
- }
- drawStation(c,q,station,time){this.industrial.station(c,q.x,q.y,time)}
+ constructor(ctx,world){this.ctx=ctx;this.world=world;this.assets=new AssetManager();this.helixRenderer=new HelixStationRenderer(this.assets);this.spaceRenderer=new InfiniteSpaceRenderer();this.industrial=new IndustrialRenderer();this.stationRenderer=new StationRenderer();this.trafficRenderer=new TrafficRenderer();this.stars=Array.from({length:620},(_,i)=>({x:(i*977)%world.size-world.size/2,y:(i*613)%world.size-world.size/2,z:.18+(i%17)/18,p:i*.37,c:i%7}));this.dust=Array.from({length:70},(_,i)=>({x:(i*431)%world.size-world.size/2,y:(i*271)%world.size-world.size/2,r:8+(i%9)*6,a:.025+(i%4)*.012}));this.rocks=world.asteroids.map((r,i)=>({...r,a:i*.8}));}
+ drawBackground(camera,w,h,time){this.spaceRenderer.draw(this.ctx,camera,w,h,time)}
+ drawStation(c,q,station,time){this.helixRenderer.draw(c,q.x,q.y,time)}
  drawWorld(camera,w,h,time=performance.now()){const c=this.ctx,planet=this.world.planet,p=camera.worldToScreen(planet.x,planet.y,w,h,.34),radius=planet.r*.38;
   const atmosphere=c.createRadialGradient(p.x-radius*.25,p.y-radius*.3,radius*.08,p.x,p.y,radius*1.25);atmosphere.addColorStop(0,'#b7ecff');atmosphere.addColorStop(.36,'#368bc6');atmosphere.addColorStop(.78,'#10345d');atmosphere.addColorStop(1,'rgba(33,120,190,0)');c.fillStyle=atmosphere;c.beginPath();c.arc(p.x,p.y,radius*1.25,0,Math.PI*2);c.fill();
   const surface=c.createLinearGradient(p.x-radius,p.y-radius,p.x+radius,p.y+radius);surface.addColorStop(0,'#8bd8ff');surface.addColorStop(.45,'#276ca9');surface.addColorStop(1,'#041126');c.fillStyle=surface;c.beginPath();c.arc(p.x,p.y,radius,0,Math.PI*2);c.fill();c.strokeStyle='rgba(125,211,252,.38)';c.lineWidth=3;c.beginPath();c.ellipse(p.x,p.y,radius*1.45,radius*.25,-.22,0,Math.PI*2);c.stroke();

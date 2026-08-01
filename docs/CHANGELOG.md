@@ -184,3 +184,12 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added persistent navigation destination, bearing, distance and ETA HUD summary.
 - Added interactive tactical-map engine with pan, zoom, coordinates, grid, object selection and double-click destination support.
 - Added multiple-galaxy data foundation and authoritative multiplayer architecture documentation.
+
+## 0.12.3 - Faction Art Foundation - 2026-08-01
+
+- Replaced the diagram-like Helix exterior with a high-resolution top-down rich-faction station asset.
+- Added modular faction-style definitions for Helix Cooperative, Frontier Union, Free Corsairs and Asterion Dynamics.
+- Defined distinct visual module sets for haulers, miners, vendors, patrol craft and maintenance craft.
+- Added infinite deterministic tiled starfields so deep space never becomes empty while travelling.
+- Added persistent distant sun, dust clouds, gas fields and background asteroid silhouettes.
+- Fixed the flight HUD to remain on one row with Menu anchored at the far right.
