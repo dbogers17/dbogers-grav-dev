@@ -70,7 +70,7 @@
             {% do assets.addCss('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css', 85) %}
         {% endif %}
     {% endif %}
-    {% do assets.addCss('theme://css/custom.css', 80) %}
+    {% do assets.addCss('theme://css/custom.css', 80) %} {% if 'secret-lab-portal-page' in body_classes %} {% do assets.addCss('theme://css/space-explorer/mini-game.css', 110) %} {% do assets.addJs('theme://js/space-explorer/mini-game.js', {group:'bottom', priority: 115, type:'module'}) %} {% endif %} {% if 'secret-lab-space-page' in body_classes %} {% do assets.addCss('theme://css/space-explorer/full-game.css', 120) %} {% do assets.addJs('theme://js/space-explorer/full-game.js', {group:'bottom', priority: 120, type:'module'}) %} {% endif %} 
 {% endblock %}
 
 {% block javascripts %}

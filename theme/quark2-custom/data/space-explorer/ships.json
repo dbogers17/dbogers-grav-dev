@@ -1,0 +1,7 @@
+[
+  {"id":"kestrel","name":"Kestrel Scout","role":"exploration","look":"needle-wing","speed":100,"shield":55,"cargo":15,"bonus":"scanner-range"},
+  {"id":"viper","name":"Viper Interceptor","role":"combat","look":"split-wing","speed":90,"shield":70,"cargo":8,"bonus":"fire-rate"},
+  {"id":"atlas","name":"Atlas Freighter","role":"trade","look":"wide-hauler","speed":52,"shield":95,"cargo":120,"bonus":"cargo"},
+  {"id":"aegis","name":"Aegis Guardian","role":"support","look":"ring-hull","speed":60,"shield":150,"cargo":30,"bonus":"ally-shield"},
+  {"id":"wraith","name":"Wraith Phantom","role":"stealth","look":"crescent","speed":84,"shield":60,"cargo":20,"bonus":"cloak"}
+]

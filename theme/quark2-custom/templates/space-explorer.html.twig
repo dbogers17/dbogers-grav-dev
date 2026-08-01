@@ -1,0 +1,18 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block body %}
+<main id="sl-space-app" data-language="{{ grav.language.getActive|default('en') }}">
+  <canvas id="sl-space-canvas" aria-label="Space Explorer game"></canvas>
+  <section class="sl-space-ui" aria-live="polite">
+    <header class="sl-space-hud">
+      <div><small>GALAXY</small><strong id="sl-space-galaxy">Azure Reach</strong></div>
+      <div><small>COORDINATES</small><strong id="sl-space-coordinates">0, 0</strong></div>
+      <div><small>SHIELD / HULL</small><strong id="sl-space-health">100 / 100</strong></div>
+      <button id="sl-space-map" type="button">Map</button>
+      <button id="sl-space-menu" type="button">Menu</button>
+    </header>
+    <aside id="sl-space-panel" hidden></aside>
+    <aside id="sl-space-dialog" hidden></aside>
+  </section>
+</main>
+{% endblock %}
