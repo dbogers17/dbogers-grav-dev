@@ -124,3 +124,10 @@ body.secret-lab-portal-page .secret-lab-filter{padding:.4rem .58rem;font-size:.6
 body.secret-lab-portal-page .sl-mini-actions{z-index:110;align-items:center}
 body.secret-lab-portal-page #sl-mini-location{padding:.48rem .7rem;border:1px solid rgba(125,211,252,.25);border-radius:999px;background:rgba(3,10,27,.72);color:#a5d8f3;font-size:.67rem;letter-spacing:.06em;text-transform:uppercase;backdrop-filter:blur(9px)}
 @media(max-width:760px){body.secret-lab-portal-page .secret-lab-filters{top:calc(var(--header-height,54px) + .25rem)!important;width:calc(100vw - 1rem)}body.secret-lab-portal-page #sl-mini-location{display:none}}
+
+/* Portal layering and movement v5 */
+body.secret-lab-portal-page #sl-mini-space-ship{position:absolute!important;inset:0 auto auto 0!important;z-index:2!important;opacity:.62!important;mix-blend-mode:screen;pointer-events:none}
+body.secret-lab-portal-page #body-wrapper{z-index:3!important}
+body.secret-lab-portal-page .secret-lab-card,body.secret-lab-portal-page .secret-lab-featured{z-index:4!important;background:rgba(5,15,32,.82)!important}
+body.secret-lab-portal-page .secret-lab-card-thumb{opacity:.94}
+body.secret-lab-portal-page .secret-lab-filters{z-index:60!important}
