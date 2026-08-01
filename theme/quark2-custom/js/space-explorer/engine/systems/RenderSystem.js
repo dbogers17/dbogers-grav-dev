@@ -1,5 +1,5 @@
 export class RenderSystem{
- constructor(ctx,world){this.ctx=ctx;this.world=world;this.stars=Array.from({length:620},(_,i)=>({x:(i*977)%world.size-world.size/2,y:(i*613)%world.size-world.size/2,z:.18+(i%17)/18,p:i*.37,c:i%7}));this.dust=Array.from({length:70},(_,i)=>({x:(i*431)%world.size-world.size/2,y:(i*271)%world.size-world.size/2,r:8+(i%9)*6,a:.025+(i%4)*.012}));this.rocks=Array.from({length:42},(_,i)=>({x:-1650+(i*173)%720,y:600+(i*241)%620,r:5+(i%8)*3,a:i*.8}));}
+ constructor(ctx,world){this.ctx=ctx;this.world=world;this.stars=Array.from({length:620},(_,i)=>({x:(i*977)%world.size-world.size/2,y:(i*613)%world.size-world.size/2,z:.18+(i%17)/18,p:i*.37,c:i%7}));this.dust=Array.from({length:70},(_,i)=>({x:(i*431)%world.size-world.size/2,y:(i*271)%world.size-world.size/2,r:8+(i%9)*6,a:.025+(i%4)*.012}));this.rocks=world.asteroids.map((r,i)=>({...r,a:i*.8}));}
  drawBackground(camera,w,h,time){const c=this.ctx;
   const base=c.createLinearGradient(0,0,w,h);base.addColorStop(0,'#01030b');base.addColorStop(.48,'#061a3b');base.addColorStop(1,'#020611');c.fillStyle=base;c.fillRect(0,0,w,h);
   const nebula=(x,y,r,inner,alpha)=>{const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,inner);g.addColorStop(.45,inner.replace(/[^,]+\)$/,'0.18)'));g.addColorStop(1,'transparent');c.globalAlpha=alpha;c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2)};

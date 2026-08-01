@@ -87,3 +87,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Ship uses forward thrust, braking/reverse thrust, turning and lateral damping instead of unrestricted four-direction strafing.
 - Ship nose now points toward the mouse/flight direction.
 - Azure Reach background upgraded with multi-layer stars, animated nebulae, a distant star, atmospheric planet shading and an asteroid field.
+
+## 0.9.2 - Flight Systems & Save Slots - 2026-08-01
+
+- Three local save slots with required explorer name, unique-name validation in the browser, recovery code and last-saved timestamp.
+- Drafted server save API for global names, server backups and recovery.
+- Shift boost with energy usage and regeneration.
+- Speed, shield, hull and boost HUD.
+- Slower acceleration, speed-dependent turning and light A/D lateral thrusters.
+- First asteroid and station collision damage model.
+- Shield ring around the player ship.
+- Larger labelled Close controls.

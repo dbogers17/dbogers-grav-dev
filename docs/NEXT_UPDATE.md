@@ -1,9 +1,9 @@
-# Next update: v0.9.2 - Navigation and Visual Polish
+# Next update: v0.10.0 - Save Service
 
-1. Add target selection and navigation indicator on the map.
-2. Add engine-owned minimap.
-3. Add parallax station traffic and distant ships.
-4. Persist all settings through SaveSystem.
-5. Add a release notes screen to the start menu.
+1. Add a small same-origin save API inside Grav_Dev.
+2. SQLite WAL database with sessions, three slots, revisions and globally unique explorer names.
+3. Secure HttpOnly session cookie and hashed recovery codes.
+4. Slot synchronization and conflict handling.
+5. Admin authentication design before dev cheats are exposed.
 
-Questions: Should mouse steering remain primary, or should A/D turning be primary with optional mouse steering? Should W always be thrust and S always be brake/reverse?
+Later flight build: target health bars, station shields, asteroid integrity, collision particles and interactable objects.

@@ -1,28 +1,7 @@
-const wrap=(a)=>Math.atan2(Math.sin(a),Math.cos(a));
+const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export class PlayerShip{
- constructor(save){Object.assign(this,{x:save.x,y:save.y,vx:0,vy:0,angle:-Math.PI/2,maxSpeed:520,reverseSpeed:150,thrust:560,reverseThrust:260,turnSpeed:3.8,drag:.72,lateralDamping:3.4,color:save.shipColor})}
- update(dt,input,pointer,w,h,camera){
-  const axis=input.axis();
-  const screen=camera.worldToScreen(this.x,this.y,w,h,1);
-  const mouseAngle=Math.atan2(pointer.y-screen.y,pointer.x-screen.x);
-  const mouseDistance=Math.hypot(pointer.x-screen.x,pointer.y-screen.y);
-  if(mouseDistance>45){const delta=wrap(mouseAngle-this.angle);this.angle+=Math.max(-this.turnSpeed*dt,Math.min(this.turnSpeed*dt,delta));}
-  if(axis.x){this.angle+=axis.x*this.turnSpeed*.72*dt;}
-  const fx=Math.cos(this.angle),fy=Math.sin(this.angle),rx=-fy,ry=fx;
-  const forward=this.vx*fx+this.vy*fy,lateral=this.vx*rx+this.vy*ry;
-  let nextForward=forward;
-  if(axis.y<0)nextForward+=this.thrust*dt;
-  if(axis.y>0){if(nextForward>30)nextForward*=Math.exp(-4.8*dt);else nextForward-=this.reverseThrust*dt;}
-  nextForward*=Math.exp(-this.drag*dt);
-  const nextLateral=lateral*Math.exp(-this.lateralDamping*dt);
-  nextForward=Math.max(-this.reverseSpeed,Math.min(this.maxSpeed,nextForward));
-  this.vx=fx*nextForward+rx*nextLateral;this.vy=fy*nextForward+ry*nextLateral;
-  this.x+=this.vx*dt;this.y+=this.vy*dt;
- }
- draw(ctx,camera,w,h){
-  const p=camera.worldToScreen(this.x,this.y,w,h,1),speed=Math.hypot(this.vx,this.vy);
-  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(this.angle+Math.PI/2);
-  if(speed>20){const flame=18+Math.min(28,speed*.07),g=ctx.createLinearGradient(0,10,0,flame+12);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.28,'rgba(56,189,248,.85)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-5,11);ctx.lineTo(0,flame+12);ctx.lineTo(5,11);ctx.closePath();ctx.fill();}
-  ctx.shadowBlur=20;ctx.shadowColor=this.color;ctx.fillStyle=this.color;ctx.strokeStyle='#eefaff';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,-25);ctx.lineTo(14,13);ctx.lineTo(6,9);ctx.lineTo(0,18);ctx.lineTo(-6,9);ctx.lineTo(-14,13);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#e2f7ff';ctx.beginPath();ctx.ellipse(0,-7,4,7,0,0,Math.PI*2);ctx.fill();ctx.restore();
- }
+ constructor(save){Object.assign(this,{x:save.x,y:save.y,vx:0,vy:0,angle:-Math.PI/2,radius:18,maxSpeed:500,boostSpeed:780,reverseSpeed:130,thrust:290,boostThrust:620,reverseThrust:220,turnSpeed:3.5,drag:.48,lateralDamping:2.8,color:save.shipColor,shield:save.shield,maxShield:save.maxShield,hull:save.hull,maxHull:save.maxHull,boost:save.boost,maxBoost:save.maxBoost,boosting:false,invulnerable:0})}
+ update(dt,input,pointer,w,h,camera){const axis=input.axis(),screen=camera.worldToScreen(this.x,this.y,w,h,1),target=Math.atan2(pointer.y-screen.y,pointer.x-screen.x),distance=Math.hypot(pointer.x-screen.x,pointer.y-screen.y),speed=Math.hypot(this.vx,this.vy),turnPenalty=.38+.62*(1-Math.min(1,speed/this.boostSpeed));if(distance>45){const delta=wrap(target-this.angle);this.angle+=Math.max(-this.turnSpeed*turnPenalty*dt,Math.min(this.turnSpeed*turnPenalty*dt,delta))}const fx=Math.cos(this.angle),fy=Math.sin(this.angle),rx=-fy,ry=fx;let forward=this.vx*fx+this.vy*fy,lateral=this.vx*rx+this.vy*ry;const wantsBoost=input.keys.has('shift')&&axis.y<0&&this.boost>0;this.boosting=wantsBoost;if(axis.y<0)forward+=(wantsBoost?this.boostThrust:this.thrust)*dt;if(axis.y>0){if(forward>25)forward*=Math.exp(-3.7*dt);else forward-=this.reverseThrust*dt}lateral+=axis.x*150*dt;forward*=Math.exp(-this.drag*dt);lateral*=Math.exp(-this.lateralDamping*dt);const limit=wantsBoost?this.boostSpeed:this.maxSpeed;forward=Math.max(-this.reverseSpeed,Math.min(limit,forward));this.vx=fx*forward+rx*lateral;this.vy=fy*forward+ry*lateral;this.x+=this.vx*dt;this.y+=this.vy*dt;this.boost=Math.max(0,Math.min(this.maxBoost,this.boost+(wantsBoost?-30:13)*dt));this.invulnerable=Math.max(0,this.invulnerable-dt)}
+ damage(amount,{bypassShield=false}={}){if(this.invulnerable>0)return;if(!bypassShield&&this.shield>0){const used=Math.min(this.shield,amount);this.shield-=used;amount-=used}if(amount>0)this.hull=Math.max(0,this.hull-amount);this.invulnerable=.35}
+ draw(ctx,camera,w,h){const p=camera.worldToScreen(this.x,this.y,w,h,1),speed=Math.hypot(this.vx,this.vy);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(this.angle+Math.PI/2);if(speed>15){const flame=18+Math.min(42,speed*.065),g=ctx.createLinearGradient(0,11,0,flame+12);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.25,this.boosting?'rgba(167,139,250,.95)':'rgba(56,189,248,.9)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(-5,11);ctx.lineTo(0,flame+12);ctx.lineTo(5,11);ctx.closePath();ctx.fill()}if(this.shield>0){ctx.globalAlpha=.18+.18*(this.shield/this.maxShield);ctx.strokeStyle='#67e8f9';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,25,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}ctx.shadowBlur=20;ctx.shadowColor=this.color;ctx.fillStyle=this.invulnerable>0?'#fff':this.color;ctx.strokeStyle='#eefaff';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,-25);ctx.lineTo(14,13);ctx.lineTo(6,9);ctx.lineTo(0,18);ctx.lineTo(-6,9);ctx.lineTo(-14,13);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
 }

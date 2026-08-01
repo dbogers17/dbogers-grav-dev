@@ -80,3 +80,14 @@
 - A/D adjust heading; lateral drift decays faster than forward motion.
 - Ship nose follows mouse direction smoothly.
 - Azure Reach shows nebulae, varied stars, Neris, asteroid silhouettes and a distant star.
+
+## v0.9.2 acceptance tests
+
+- Maximum three slots; duplicate browser-local names are rejected case-insensitively.
+- Recovery code and last-saved timestamp appear in save list and game menu.
+- Shift boost drains and regenerates boost.
+- Speed HUD updates while flying.
+- Shield absorbs regular collision damage before hull.
+- High-speed asteroid collision can damage hull.
+- Destroyed ship respawns at Helix Station.
+- Close buttons use readable text and larger hit targets.
