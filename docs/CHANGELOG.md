@@ -98,3 +98,15 @@ Versies volgen SemVer: **major.minor.patch**.
 - First asteroid and station collision damage model.
 - Shield ring around the player ship.
 - Larger labelled Close controls.
+
+## 0.10.0 - Docking and Save UX - 2026-08-01
+
+- Start screen renamed to New Game, Load Game and Settings.
+- New Game creates the explorer; Load Game only shows existing saves.
+- Fixed Menu and Map clicks by stopping per-frame DOM replacement.
+- Telemetry now updates only speed, shield, hull and boost values.
+- A/D lateral thrusters increased for controlled diagonal movement.
+- Boost speed decays gradually instead of snapping to normal maximum speed.
+- Shield regenerates after six seconds without damage.
+- Save records exact coordinates, damage state, boost and playtime; autosave every fifteen seconds.
+- Helix Station docking with E at low speed and full repair service.

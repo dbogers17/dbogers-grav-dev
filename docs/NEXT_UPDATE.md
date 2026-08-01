@@ -1,9 +1,8 @@
-# Next update: v0.10.0 - Save Service
+# Next update: v0.10.1 - Save Service Foundation
 
-1. Add a small same-origin save API inside Grav_Dev.
-2. SQLite WAL database with sessions, three slots, revisions and globally unique explorer names.
-3. Secure HttpOnly session cookie and hashed recovery codes.
-4. Slot synchronization and conflict handling.
-5. Admin authentication design before dev cheats are exposed.
-
-Later flight build: target health bars, station shields, asteroid integrity, collision particles and interactable objects.
+1. Implement same-origin SQLite save API in Grav_Dev.
+2. Secure anonymous HttpOnly session cookie.
+3. Globally unique explorer names and hashed recovery codes.
+4. Three server-backed slots with revision history.
+5. Sync and conflict handling between local and server saves.
+6. Define admin authentication before enabling dev cheats.

@@ -91,3 +91,14 @@
 - High-speed asteroid collision can damage hull.
 - Destroyed ship respawns at Helix Station.
 - Close buttons use readable text and larger hit targets.
+
+## v0.10.0 acceptance tests
+
+- Start screen shows New Game, Load Game and Settings.
+- Load Game never creates a new explorer.
+- Menu and Map buttons remain clickable during continuous rendering.
+- Save and autosave preserve exact coordinates and ship condition.
+- A/D provide stronger lateral thrust without replacing mouse steering.
+- Boost speed decays gradually after Shift is released.
+- Shield starts regenerating six seconds after the last collision.
+- At low speed near Helix Station, E opens Docked; Repair Ship restores all vitals.
