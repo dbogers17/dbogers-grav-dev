@@ -263,3 +263,10 @@ Versies volgen SemVer: **major.minor.patch**.
 - Fixed the Space Explorer title wrapping and orphaned final letter on wide displays.
 - Applied the cinematic station background and dark visual shell to Start, Load, Creator and Settings.
 - Added state-specific visual regression assertions for the complete pre-game menu flow.
+
+## 0.14.0 - Clean Runtime Rebuild
+
+- Removed all previous Space Explorer assets, saves and legacy runtime modules.
+- Added a new single runtime with new ships, stations, planet, asteroids and pilot views.
+- Added new-game, creator, flight, navigation, minimap, map, docking, station services and one complete mission.
+- Added destructive save reset and two-way integrity verification.

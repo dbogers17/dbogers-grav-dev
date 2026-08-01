@@ -1,2 +1,0 @@
-import assert from'node:assert/strict';import{DEFAULT_EXPLORER,normalizeExplorer,randomExplorer,EXPLORER_OPTIONS}from'../data/ExplorerOptions.js';
-assert.deepEqual(normalizeExplorer({}),DEFAULT_EXPLORER);const x=randomExplorer(()=>.999);for(const[k,v]of Object.entries(x))assert.ok(EXPLORER_OPTIONS[k].includes(v));assert.equal(normalizeExplorer({suitColor:'invalid'}).suitColor,'Azure');console.log('Explorer builder tests passed');

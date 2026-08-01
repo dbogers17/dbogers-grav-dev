@@ -1,7 +1,0 @@
-[
-  {"id":"azure-reach","name":"Azure Reach","theme":"blue-nebula","risk":1},
-  {"id":"crystal-void","name":"Crystal Void","theme":"violet-crystals","risk":2},
-  {"id":"red-forge","name":"Red Forge","theme":"red-industrial","risk":3},
-  {"id":"ancient-horizon","name":"Ancient Horizon","theme":"ruins-gates","risk":4},
-  {"id":"event-horizon","name":"Event Horizon","theme":"black-hole","risk":5}
-]
