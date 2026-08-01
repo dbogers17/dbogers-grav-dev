@@ -1,3 +1,3 @@
-# Next update: v0.13.1 - Missions and Communications
+# Next update: v0.13.2 - Missions and Communications
 
-Complete interactive mission acceptance, reward claiming, NPC ship communications, trade panels, docking routes and pilot face/hair customization after v0.13.0 browser acceptance.
+Add complete mission acceptance and reward flow, NPC ship communications, trade interactions, dedicated side/back character art and additional faction stations after v0.13.1 acceptance.

@@ -237,3 +237,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Made the tactical map full-screen.
 - Replaced hard station bounce with soft collision damping.
 - Removed obsolete renderer files from the active runtime.
+
+## 0.13.1 - Asset and UI Recovery - 2026-08-01
+
+- Added creator Front, Side and Back views with reliable preloading.
+- Removed active legacy atlas renderers and broad legacy sheets.
+- Replaced station grid and procedural counters with the docking-bay artwork and interaction zones.
+- Added separated seeded stars and distant background asteroids.
+- Made the tactical map viewport truly full-screen while traffic simulation remains active.
+- Added a flight minimap with stations, traffic, asteroids and destination.
+- Rendered outposts and relays as scaled physical station modules instead of dots.
+- Added SHA-256 release integrity verification.
