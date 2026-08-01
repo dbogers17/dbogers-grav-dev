@@ -1,0 +1,41 @@
+/* Secret Lab portal refresh v2 */
+body.secret-lab-portal-page{background:#030712!important;min-height:100vh}
+body.secret-lab-portal-page::before{content:none!important;display:none!important}
+body.secret-lab-portal-page .ambient-bg,
+body.secret-lab-portal-page .ambient-network,
+body.secret-lab-portal-page .secret-lab-bg-tiles{display:none!important}
+body.secret-lab-portal-page #sl-mini-space{z-index:0;opacity:1}
+body.secret-lab-portal-page #header{background:rgba(3,7,18,.82)!important;border-bottom:1px solid rgba(96,165,250,.13);backdrop-filter:blur(18px)}
+body.secret-lab-portal-page #body-wrapper{background:transparent!important}
+body.secret-lab-portal-page #body-wrapper>.container{max-width:none!important;width:100%!important;padding-inline:clamp(1rem,3vw,3rem)}
+body.secret-lab-portal-page #body-wrapper>.container>.content-item{padding:0!important}
+body.secret-lab-portal-page #secret-lab-content{position:relative;z-index:2;padding-top:clamp(2.5rem,6vw,5rem)}
+body.secret-lab-portal-page #secret-lab-content>h1{font-size:clamp(2.6rem,6vw,5.4rem);line-height:.95;letter-spacing:-.055em;margin:0 auto 1rem!important;padding-inline:1rem;text-shadow:0 0 45px rgba(96,165,250,.22)}
+body.secret-lab-portal-page .section-intro{font-size:clamp(1rem,1.5vw,1.2rem);color:#a5b4ca!important;margin:0 auto 2.5rem!important;text-align:center;max-width:62ch!important}
+body.secret-lab-portal-page .secret-lab-featured{width:min(1500px,calc(100vw - 2rem))!important;margin:0 auto 2.25rem!important;min-height:clamp(330px,42vw,520px);border-radius:1.6rem;border:1px solid rgba(96,165,250,.28);background:#071224;box-shadow:0 35px 90px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.025) inset;isolation:isolate}
+body.secret-lab-portal-page .secret-lab-featured::before{background:linear-gradient(90deg,rgba(2,6,18,.98),rgba(2,10,28,.74) 42%,rgba(2,10,28,.12) 78%),linear-gradient(0deg,rgba(2,6,18,.94),transparent 68%)}
+body.secret-lab-portal-page .secret-lab-featured-body{min-height:inherit;padding:clamp(2rem,5vw,4.5rem);justify-content:center;align-items:flex-start}
+body.secret-lab-portal-page .secret-lab-featured-title{font-size:clamp(2rem,4vw,3.6rem);letter-spacing:-.04em}
+body.secret-lab-portal-page .secret-lab-featured-desc{font-size:clamp(.95rem,1.4vw,1.15rem);max-width:42ch;line-height:1.65}
+body.secret-lab-portal-page .secret-lab-featured-cta{padding:.85rem 1.4rem;background:linear-gradient(135deg,#2563eb,#0ea5e9);box-shadow:0 14px 35px rgba(37,99,235,.35)}
+body.secret-lab-portal-page .secret-lab-portal{width:min(1600px,100%)!important;margin-inline:auto!important;padding-inline:0!important}
+body.secret-lab-portal-page .secret-lab-filters{position:sticky;top:calc(var(--site-header-height,72px) + .5rem);z-index:20;justify-content:flex-start;gap:.45rem;padding:.65rem;border:1px solid rgba(148,163,184,.14);border-radius:1rem;background:rgba(3,9,24,.78);backdrop-filter:blur(20px);overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;box-shadow:0 16px 45px rgba(0,0,0,.28)}
+body.secret-lab-portal-page .secret-lab-filters::-webkit-scrollbar{display:none}
+body.secret-lab-portal-page .secret-lab-filter{white-space:nowrap;padding:.6rem .9rem;border:1px solid transparent;border-radius:.75rem}
+body.secret-lab-portal-page .secret-lab-filter::after{display:none}
+body.secret-lab-portal-page .secret-lab-filter.is-active{background:linear-gradient(135deg,rgba(37,99,235,.95),rgba(14,165,233,.88));border-color:rgba(147,197,253,.45);box-shadow:0 8px 24px rgba(37,99,235,.25)}
+body.secret-lab-portal-page .secret-lab-genre{margin-block:3rem}
+body.secret-lab-portal-page .secret-lab-genre-title{font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:#dbeafe}
+body.secret-lab-portal-page .secret-lab-genre-title::after{background:linear-gradient(90deg,rgba(96,165,250,.55),transparent)}
+body.secret-lab-portal-page .secret-lab-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem}
+body.secret-lab-portal-page .secret-lab-card{gap:.75rem;padding:.55rem;border:1px solid transparent;border-radius:1.2rem;background:linear-gradient(180deg,rgba(15,23,42,.62),rgba(5,12,27,.38));transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+body.secret-lab-portal-page a.secret-lab-card:hover{transform:translateY(-7px);border-color:rgba(96,165,250,.42);box-shadow:0 22px 55px rgba(0,0,0,.38),0 0 30px rgba(37,99,235,.08)}
+body.secret-lab-portal-page .secret-lab-card-thumb{aspect-ratio:16/10;border-radius:.9rem;border-color:rgba(148,163,184,.14);box-shadow:none}
+body.secret-lab-portal-page .secret-lab-card-title{padding:0 .35rem .25rem;font-size:.92rem;color:#eef6ff}
+body.secret-lab-portal-page .secret-lab-card-tag{top:.7rem;right:.7rem;font-size:.58rem;padding:.32rem .62rem;border-color:rgba(255,255,255,.14)}
+body.secret-lab-portal-page .secret-lab-card--wip{opacity:.66}
+body.secret-lab-portal-page .secret-lab-card--wip:hover{opacity:.9}
+body.secret-lab-portal-page .sl-mini-actions{right:1.25rem;bottom:1.25rem}
+body.secret-lab-portal-page .sl-mini-actions button,
+body.secret-lab-portal-page .sl-mini-actions a{border-color:rgba(96,165,250,.42);background:rgba(3,10,27,.86);box-shadow:0 12px 35px rgba(0,0,0,.35)}
+@media(max-width:700px){body.secret-lab-portal-page #secret-lab-content{padding-top:2rem}body.secret-lab-portal-page .secret-lab-featured{min-height:400px}body.secret-lab-portal-page .secret-lab-featured-body{justify-content:flex-end}body.secret-lab-portal-page .secret-lab-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}body.secret-lab-portal-page .secret-lab-card{padding:.35rem}body.secret-lab-portal-page .secret-lab-card-title{font-size:.78rem}}
