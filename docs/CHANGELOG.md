@@ -78,3 +78,12 @@ Versies volgen SemVer: **major.minor.patch**.
 - New save version 3; development progress intentionally resets.
 - Node smoke tests added for state transitions and save validation.
 - Legacy full-game scripts removed from asset registration.
+
+## 0.9.1 - Flight Feel - 2026-08-01
+
+- Version synchronized to v0.9.1 in the engine and Secret Lab portal.
+- Closing Settings now returns to Start or Menu instead of entering Flight unexpectedly.
+- `M` now toggles the map open and closed.
+- Ship uses forward thrust, braking/reverse thrust, turning and lateral damping instead of unrestricted four-direction strafing.
+- Ship nose now points toward the mouse/flight direction.
+- Azure Reach background upgraded with multi-layer stars, animated nebulae, a distant star, atmospheric planet shading and an asteroid field.

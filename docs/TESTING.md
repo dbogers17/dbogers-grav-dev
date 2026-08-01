@@ -68,3 +68,15 @@
 - Map and Menu buttons always respond once.
 - Exit saves and returns to `/secret-lab`.
 - Invalid save values are clamped by SaveSystem.
+
+## v0.9.1 acceptance tests
+
+- Portal and start screen both show v0.9.1.
+- Start → Settings → Close returns to Start.
+- Menu → Settings → Close returns to Menu.
+- M opens Map from Flight and closes Map back to Flight.
+- W applies forward thrust in the direction of the ship nose.
+- S brakes and then applies limited reverse thrust.
+- A/D adjust heading; lateral drift decays faster than forward motion.
+- Ship nose follows mouse direction smoothly.
+- Azure Reach shows nebulae, varied stars, Neris, asteroid silhouettes and a distant star.

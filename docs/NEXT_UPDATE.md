@@ -1,9 +1,9 @@
-# Next update: v0.9.1 - Verification and Navigation
+# Next update: v0.9.2 - Navigation and Visual Polish
 
-1. Verify all v0.9.0 states live and fix regressions.
-2. Restore clickable navigation targets on the map.
-3. Add a minimap owned by the engine UI.
-4. Add settings persistence and proper release notes.
-5. Add automated browser tests when Node is available on the dev server.
+1. Add target selection and navigation indicator on the map.
+2. Add engine-owned minimap.
+3. Add parallax station traffic and distant ships.
+4. Persist all settings through SaveSystem.
+5. Add a release notes screen to the start menu.
 
-Questions after testing: Does movement feel responsive enough? Is camera smoothing comfortable? Should the start screen emphasize Continue or New Game during development?
+Questions: Should mouse steering remain primary, or should A/D turning be primary with optional mouse steering? Should W always be thrust and S always be brake/reverse?
