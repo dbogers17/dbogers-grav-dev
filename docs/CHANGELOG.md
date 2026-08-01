@@ -193,3 +193,15 @@ Versies volgen SemVer: **major.minor.patch**.
 - Added infinite deterministic tiled starfields so deep space never becomes empty while travelling.
 - Added persistent distant sun, dust clouds, gas fields and background asteroid silhouettes.
 - Fixed the flight HUD to remain on one row with Menu anchored at the far right.
+
+## 0.12.4 - Unified Faction Art - 2026-08-01
+
+- Added Helix Cooperative raster atlases for fleet classes, astronaut roles, celestial bodies and station interiors.
+- Added distinct hauler, miner, vendor, patrol and maintenance artwork regions.
+- Added richer explorer, engineer, salvager and pilot astronaut definitions with visible backpacks.
+- Added faction-consistent gas giant, rocky worlds, sun, nebula and asteroid-cluster art.
+- Added detailed docking bay, mission terminal and modular prop artwork.
+- Reduced starfield density and background asteroid count for cleaner readability.
+- Fixed background object distribution to avoid vertical streak-like formations.
+- Added stable integer-aligned station rendering to reduce texture shimmer while moving.
+- Replaced the old map markup with an interactive tactical grid canvas with pan, zoom and coordinates.

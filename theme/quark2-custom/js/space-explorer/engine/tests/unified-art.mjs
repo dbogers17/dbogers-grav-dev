@@ -1,0 +1,1 @@
+import assert from'node:assert/strict';import{REGIONS}from'../art/HelixSpriteAtlas.js';assert.equal(Object.keys(REGIONS.fleet).length,5);assert.ok(REGIONS.astronaut.engineer[2]>0);assert.ok(REGIONS.celestial.gas[2]>=400);assert.ok(REGIONS.interior.dock[2]>=700);console.log('Unified art tests passed');
