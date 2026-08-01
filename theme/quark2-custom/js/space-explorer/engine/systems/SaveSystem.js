@@ -2,7 +2,7 @@ const INDEX_KEY='secretLabSpaceSlotsV4',PREFIX='secretLabSpaceSlotV4:';
 const now=()=>new Date().toISOString();
 const clamp=(v,min,max,fallback)=>Number.isFinite(Number(v))?Math.max(min,Math.min(max,Number(v))):fallback;
 const token=()=>{const bytes=new Uint8Array(10);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(36).padStart(2,'0')).join('').toUpperCase().match(/.{1,5}/g).join('-')};
-export const defaults={version:4,slotId:null,recoveryCode:null,explorerName:'Explorer',galaxy:'azure-reach',ship:'kestrel',shipColor:'#7dd3fc',x:0,y:0,shield:100,maxShield:100,hull:100,maxHull:100,boost:100,maxBoost:100,credits:0,points:0,playtime:0,createdAt:null,lastSavedAt:null,discovered:['azure-reach'],quests:{main:'broken-signal',stage:0},settings:{quality:'high',fps:60,particles:70,master:.8,music:.6,effects:.8,reducedMotion:false}};
+export const defaults={version:4,slotId:null,recoveryCode:null,explorerName:'Explorer',galaxy:'azure-reach',ship:'kestrel',shipColor:'#7dd3fc',x:245,y:30,shield:100,maxShield:100,hull:100,maxHull:100,boost:100,maxBoost:100,credits:0,points:0,playtime:0,createdAt:null,lastSavedAt:null,discovered:['azure-reach'],quests:{main:'broken-signal',stage:0},settings:{quality:'high',fps:60,particles:70,master:.8,music:.6,effects:.8,reducedMotion:false}};
 export class SaveSystem{
  list(){try{const ids=JSON.parse(localStorage.getItem(INDEX_KEY)||'[]');return ids.map(id=>this.load(id)).filter(Boolean).sort((a,b)=>(b.lastSavedAt||'').localeCompare(a.lastSavedAt||''))}catch{return[]}}
  existsName(name,except=null){const n=name.trim().toLowerCase();return this.list().some(s=>s.slotId!==except&&s.explorerName.toLowerCase()===n)}

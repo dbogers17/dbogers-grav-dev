@@ -110,3 +110,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Shield regenerates after six seconds without damage.
 - Save records exact coordinates, damage state, boost and playtime; autosave every fifteen seconds.
 - Helix Station docking with E at low speed and full repair service.
+
+## 0.10.1 - Helix Approach - 2026-08-01
+
+- Boost velocity now coasts down gradually instead of being clamped immediately to normal maximum speed.
+- A/D lateral thrusters increased by 15 units, from 235 to 250.
+- New explorers spawn beside Helix Station instead of inside its collision body.
+- Existing saves found inside the station are moved to the safe spawn point.
+- Helix Station enlarged and redesigned with pseudo-3D rings, central hub, docking arm, shield glow and animated navigation lights.
+- Visible docking radius and proximity prompt: Press E to dock.
+- Docking requires proximity and low speed.
+- Asteroids receive stronger pseudo-3D lighting and shading.

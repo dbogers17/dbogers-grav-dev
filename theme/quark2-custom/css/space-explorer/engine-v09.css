@@ -12,3 +12,6 @@ body.secret-lab-space-page{overflow:hidden;background:#01030a}body.secret-lab-sp
 /* v0.10.0 Docking and Save UX */
 .sl-start p{color:#b6c8dd}.sl-start button:first-of-type{background:linear-gradient(180deg,#2474ce,#16529a);box-shadow:0 10px 26px rgba(37,99,235,.2)}
 .state-docked::before{content:'';position:absolute;inset:0;background:rgba(0,3,10,.45);backdrop-filter:blur(3px)}
+
+/* v0.10.1 Helix Approach */
+#sl-dock-prompt{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);display:flex;align-items:center;gap:.7rem;padding:.65rem .85rem;border:1px solid rgba(103,232,249,.42);border-radius:11px;background:rgba(3,16,35,.92);box-shadow:0 12px 38px rgba(0,0,0,.42),0 0 24px rgba(34,211,238,.08);color:#e6faff;backdrop-filter:blur(10px)}#sl-dock-prompt b{font-size:.68rem;letter-spacing:.1em;color:#67e8f9}#sl-dock-prompt span{font-size:.78rem}#sl-dock-prompt[hidden]{display:none!important}

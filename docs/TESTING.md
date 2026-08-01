@@ -102,3 +102,13 @@
 - Boost speed decays gradually after Shift is released.
 - Shield starts regenerating six seconds after the last collision.
 - At low speed near Helix Station, E opens Docked; Repair Ship restores all vitals.
+
+## v0.10.1 acceptance tests
+
+- Releasing Shift above 500 u/s causes a gradual coast-down, without an immediate speed snap.
+- A/D lateral movement is noticeably stronger than v0.10.0.
+- New explorer starts next to Helix Station and outside collision geometry.
+- Docking circle is visible around the station.
+- Dock prompt appears inside the radius and disappears outside it.
+- E docks only while nearby and below 55 u/s.
+- Helix Station has visible rings, hub, dock arm, shield glow and animated lights.
