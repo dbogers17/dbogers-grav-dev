@@ -131,3 +131,13 @@
 - Ship has visible layered hull, cockpit, wings, two engines, navigation lights and shield volume.
 - Asteroids have irregular silhouettes, directional shading, shadows and craters.
 - Station shops have raised shells, counters, vents, shadows, lights and recognizable NPC bodies.
+
+## v0.11.5 acceptance tests
+
+- New Game opens character builder and every arrow updates the live astronaut preview.
+- Randomize produces valid options and Create Explorer stores appearance in the slot.
+- Saved astronaut appearance is used in Helix Station.
+- Helix Station exterior has a central core, multiple arms, lights and attached substation.
+- At least five traffic ships move around the safe sector.
+- Asteroids cover several broad regions while leaving safe space around Helix.
+- Map identifies station, outposts, mission, field, gate, safe zone and route.

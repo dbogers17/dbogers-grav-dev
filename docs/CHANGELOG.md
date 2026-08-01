@@ -161,3 +161,14 @@ Versies volgen SemVer: **major.minor.patch**.
 - Redesigned the player ship with layered hull shading, wings, cockpit glass, navigation lights, dual engines and shield volume.
 - Redesigned asteroids with irregular silhouettes, directional lighting, shadows and crater layers.
 - Increased Station Hub depth with raised shop shells, vents, illuminated counters, shadows and more character-like NPC sprites.
+
+## 0.11.5 - World Depth and Explorer Builder - 2026-08-01
+
+- Added an English astronaut character builder with live preview, unique name, suit type, colors, helmet, visor, backpack, accents and Randomize.
+- Explorer appearance is stored per save slot and used inside stations.
+- Added modular astronaut, station and traffic renderers.
+- Replaced Helix exterior with a central core, multiple asymmetric arms, docking modules, lights and attached satellite station.
+- Added transports, patrol, mining and vendor traffic around the safe starting sector.
+- Added Azure Relay and Cobalt Mining Post.
+- Expanded deterministic asteroid generation to four large clusters with varied sizes.
+- Rebuilt the galaxy map with object types, safe zone, route line, selected destination, distance, threat and legend.

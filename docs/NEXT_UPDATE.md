@@ -1,7 +1,7 @@
-# Next update: v0.11.5 - Art and Interaction Pass
+# Next update: v0.11.6 - Station Life and Space Debris
 
-1. Evaluate v0.11.4 live against the supplied visual references.
-2. Add station props, machinery, crates, doors and a visible docked ship.
-3. Add shop windows with credits, inventory and prices.
-4. Add object selection rings and conditional health bars.
-5. Add asteroid size classes and resource interaction.
+1. Add station machinery, pipes, doors, crates and visible docked ship.
+2. Add decorative wrecks and debris fields.
+3. Add background asteroid parallax layers and distant silhouettes.
+4. Make map destinations clickable and connect them to flight navigation.
+5. Add first trade, repair and mission interface panels.
