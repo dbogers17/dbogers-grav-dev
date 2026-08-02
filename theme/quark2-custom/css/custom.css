@@ -1,0 +1,3570 @@
+/*
+ * Quark 2 — user customizations
+ *
+ * This file is safe to edit. It is loaded last so anything here overrides
+ * theme.css without having to mark rules !important.
+ */
+
+/* Quark2 1.1.7 dropped `isolation: isolate` from its own `body` rule.
+ * Without it, the ambient background's `position: absolute; z-index: -1`
+ * escapes body's stacking context instead of staying pinned just behind its
+ * content, and paints invisibly below everything. Re-declared here so the
+ * ambient background keeps working regardless of what stock quark2 does
+ * with that property in future updates. */
+body {
+	isolation: isolate;
+}
+
+/* Quark2 1.1.7 also swapped the stock display font from Space Grotesk to
+ * Cal Sans and retuned heading letter-spacing to match Cal Sans's metrics
+ * (this site was built and tuned against Space Grotesk). Restored here -
+ * the actual Space Grotesk font files are still shipped by the theme, only
+ * the CSS variable pointing to them changed. */
+:root {
+	--pico-font-family-display: "Space Grotesk", "Inter", sans-serif;
+}
+h1, h2, h3, h4, h5, h6, .display, .h-display {
+	letter-spacing: 0.01em;
+}
+h1 { letter-spacing: 0.01em; }
+h2 { letter-spacing: 0.015em; }
+h3 { letter-spacing: 0.02em; }
+
+body.portfolio-page,
+body.portfolio-subpage {
+	--q2-accent: #2563eb;
+	--q2-link: #2563eb;
+}
+
+/*
+ * Ambient background — spans the full document height (not just the
+ * viewport) and scrolls along with the page, so a given blob stays anchored
+ * to the content next to it instead of trailing the viewport. Height is set
+ * inline by particles.js once the document's real height is known. Sits
+ * behind everything (z-index -1) so it works on every page, regardless of
+ * theme (light/dark variants below) or viewport width.
+ */
+.ambient-bg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	overflow: hidden;
+	z-index: -1;
+	pointer-events: none;
+}
+
+/* The dots/lines canvas is pinned to the viewport (NOT the document) and
+   redrawn with a scroll offset in particles.js, instead of being one giant
+   canvas sized to the whole page. A profiler recording showed the GPU
+   compositor re-presenting that old full-document canvas on every single
+   frame regardless of whether its content had changed — the sheer surface
+   size (viewport width × full page height × up to 2x pixel density) made
+   that expensive on its own, independent of the draw loop, which was
+   already idling correctly. A viewport-sized canvas is a fraction of the
+   pixels to composite, on every page regardless of length. */
+.ambient-network {
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: -1;
+	pointer-events: none;
+	display: block;
+}
+
+.ambient-blobs {
+	position: absolute;
+	inset: 0;
+}
+
+/* One "screen" worth of blobs, repeated down the document so the glow
+   reappears every viewport height instead of thinning out over a tall page. */
+.ambient-blob-screen {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	/* content-visibility: auto was tried here to skip rendering off-screen
+	   blobs, but it silently applies paint containment, which clips each
+	   blob's blur bleed at the screen's own edge instead of letting it
+	   blend into the next screen — that showed up as a hard seam every
+	   ~viewport-height down the page. Left off; the visual blend across
+	   screens matters more than that particular optimization. */
+}
+
+.ambient-blob-screen--flip {
+	transform: scaleX(-1);
+}
+
+/* Static by design: each blob gets a one-time random transform assigned in
+   particles.js when it's created (page load / navigation only), instead of
+   an infinite CSS animation. Nothing here ever repaints on its own, so the
+   backdrop-filter blur on the glass cards above it settles once and stays
+   settled instead of being recomputed every frame forever. */
+.ambient-blob {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(70px);
+	opacity: 0.55;
+}
+
+.blob-1 {
+	top: -10%;
+	left: -8%;
+	width: 45vw;
+	height: 45vw;
+	background: rgba(59, 130, 246, 0.26);
+}
+
+.blob-2 {
+	top: 10%;
+	right: -12%;
+	width: 38vw;
+	height: 38vw;
+	background: rgba(14, 165, 233, 0.22);
+}
+
+.blob-3 {
+	bottom: -15%;
+	left: 20%;
+	width: 42vw;
+	height: 42vw;
+	background: rgba(168, 85, 247, 0.16);
+}
+
+.blob-4 {
+	bottom: 5%;
+	right: 15%;
+	width: 26vw;
+	height: 26vw;
+	background: rgba(34, 197, 94, 0.12);
+}
+
+:root[data-theme="dark"] .blob-1 { background: rgba(59, 130, 246, 0.45); }
+:root[data-theme="dark"] .blob-2 { background: rgba(14, 165, 233, 0.40); }
+:root[data-theme="dark"] .blob-3 { background: rgba(168, 85, 247, 0.32); }
+:root[data-theme="dark"] .blob-4 { background: rgba(34, 197, 94, 0.22); }
+
+/* Any of the site's remaining infinite decorative loops (hero shapes,
+   scroll cue, typewriter cursor, project-card icon LEDs/prompt/cursor,
+   tech-feed's LIVE dot) sit inside one of .portfolio-hero / .project-card /
+   .tech-feed-card. js/reveal.js watches those three with an
+   IntersectionObserver and adds this class the moment one scrolls out of
+   view, so nothing keeps animating (and forcing the glass-card blur above
+   it to keep recomputing) for content nobody can see. Resumes exactly
+   where it left off when scrolled back — animation-play-state doesn't
+   reset the animation, just freezes/thaws it.
+   !important is required here: every animated element below sets its
+   `animation` via the shorthand, which resets animation-play-state back to
+   its initial value (running) as part of that same declaration. Those
+   rules load later in the cascade and match with equal specificity (one
+   class each), so without !important they silently win and this pause
+   never actually applies — which is exactly what was happening. */
+.q2-anim-idle,
+.q2-anim-idle * {
+	animation-play-state: paused !important;
+}
+
+/* Drifting outline shapes, hero-only — thin rotating squares/circles behind
+   the hero copy for a bit of ambient motion beyond the site-wide blobs. */
+.hero-geo {
+	position: absolute;
+	border: 1px solid var(--q2-accent);
+	opacity: 0.1;
+	border-radius: 6px;
+	pointer-events: none;
+	z-index: 0;
+	/* steps() instead of linear: the browser only needs to actually
+	   recomposite this layer at each step boundary instead of continuously
+	   interpolating every refresh tick, at 24 steps over 24s this still
+	   reads as a slow drift while cutting the real frame-submission rate
+	   drastically. */
+	animation: q2-geo-drift 36s steps(12) infinite;
+	will-change: transform;
+}
+
+.hero-geo-1 {
+	width: 140px;
+	height: 140px;
+	top: 4%;
+	right: 6%;
+	transform: rotate(12deg);
+	animation-duration: 26s;
+}
+
+.hero-geo-2 {
+	width: 90px;
+	height: 90px;
+	bottom: 14%;
+	right: 24%;
+	border-radius: 50%;
+	animation-duration: 19s;
+	animation-direction: reverse;
+}
+
+.hero-geo-3 {
+	width: 110px;
+	height: 110px;
+	top: 42%;
+	left: 3%;
+	transform: rotate(45deg);
+	animation-duration: 30s;
+}
+
+@keyframes q2-geo-drift {
+	0% {
+		transform: rotate(0deg) translateY(0);
+	}
+	100% {
+		transform: rotate(360deg) translateY(-16px);
+	}
+}
+
+@media (max-width: 800px) {
+	.hero-geo {
+		display: none;
+	}
+}
+
+/* Blocks pop in from below as you scroll — .is-visible is added by
+   js/reveal.js once a block enters the viewport. */
+body.portfolio-page .portfolio-section,
+body.portfolio-subpage .portfolio-section {
+	opacity: 0;
+	transform: translateY(48px);
+	transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+body.portfolio-page .portfolio-section.is-visible,
+body.portfolio-subpage .portfolio-section.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.portfolio-page .portfolio-section,
+	body.portfolio-subpage .portfolio-section {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}
+
+/* Skill badges — small icon cards inside the skills section. They pop in
+   with a per-card stagger once the parent .portfolio-section becomes
+   visible (reveal.js only toggles .is-visible on the section, the stagger
+   itself is pure CSS via nth-child transition-delay). */
+.skill-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: 0.75rem;
+	list-style: none;
+	padding: 0;
+	margin: 1rem 0 0;
+}
+
+.skill-card {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	padding: 0.9rem 1rem;
+	border-radius: 0.9rem;
+	/* Same blue-border language as the project tags/feature cards, dialed
+	   to a middle intensity — the hover glow below (border-color +
+	   box-shadow) still applies on top of this resting-state outline. */
+	border: 1px solid color-mix(in srgb, var(--q2-accent) 40%, transparent);
+	background: color-mix(in srgb, var(--card-background-color) 88%, white 12%);
+	color: var(--q2-text);
+	font-size: 0.85rem;
+	font-weight: 500;
+	line-height: 1.25;
+	opacity: 0;
+	transform: translateY(16px) scale(0.97);
+	transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.skill-card span {
+	color: var(--q2-text);
+}
+
+.skill-card i {
+	flex: none;
+	font-size: 1.15rem;
+	color: var(--q2-accent);
+}
+
+body.portfolio-page .portfolio-section.is-visible .skill-card,
+body.portfolio-subpage .portfolio-section.is-visible .skill-card {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+	transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+body.portfolio-page .portfolio-section.is-visible .skill-card:hover,
+body.portfolio-subpage .portfolio-section.is-visible .skill-card:hover {
+	transform: translateY(-4px);
+	border-color: var(--q2-accent);
+	box-shadow: 0 16px 32px rgba(37, 99, 235, 0.18);
+}
+
+.skill-grid .skill-card:nth-child(1) { transition-delay: 0.02s; }
+.skill-grid .skill-card:nth-child(2) { transition-delay: 0.08s; }
+.skill-grid .skill-card:nth-child(3) { transition-delay: 0.14s; }
+.skill-grid .skill-card:nth-child(4) { transition-delay: 0.20s; }
+.skill-grid .skill-card:nth-child(5) { transition-delay: 0.26s; }
+.skill-grid .skill-card:nth-child(6) { transition-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+	.skill-card {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}
+
+/* Fluid container widths — grow with the viewport (94vw) up to a ceiling,
+   so large/ultra-wide monitors aren't left with big empty side margins,
+   while small screens still get the same 94vw-based scaling as before. */
+.container {
+	max-width: clamp(320px, 96vw, 2100px);
+}
+
+.portfolio-page #body-wrapper .container {
+	max-width: clamp(320px, 96vw, 2400px);
+}
+
+.portfolio-subpage #body-wrapper .container {
+	max-width: clamp(320px, 96vw, 1800px);
+}
+
+/* Plain body paragraphs directly in a module card (not inside a grid/card,
+   where width is already bounded by the column) still need a readable
+   line length even though the card itself can now grow much wider. */
+.module-card > p {
+	max-width: 65ch;
+}
+
+body.portfolio-page #body-wrapper,
+body.portfolio-subpage #body-wrapper,
+body.portfolio-page #footer,
+body.portfolio-subpage #footer {
+	background: transparent;
+}
+
+body.portfolio-page #body-wrapper > .container > .content-item,
+body.portfolio-subpage #body-wrapper > .container > .content-item {
+	max-width: none;
+}
+
+.portfolio-subpage .content-item > p,
+.portfolio-subpage .content-item > ul,
+.portfolio-subpage .content-item > ol {
+	max-width: 70ch;
+}
+
+.portfolio-hero {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: calc(100vh - var(--site-header-height, 88px));
+	padding: 4rem 0 5rem;
+	box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+	.portfolio-hero {
+		min-height: 0;
+	}
+}
+
+/* Mouse-style "scroll down" cue, bottom-center of the hero. Reuses the
+   #to-start -> #start smooth-scroll wiring already set up in site.js. */
+.hero-scroll-cue {
+	position: absolute;
+	left: 50%;
+	bottom: 1rem;
+	transform: translateX(-50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.6rem;
+	cursor: pointer;
+	z-index: 2;
+	animation: q2-scroll-cue-bob 4s steps(5) infinite;
+}
+
+.hero-scroll-cue-label {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.65rem;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	color: var(--q2-text-muted);
+}
+
+.hero-scroll-cue-mouse {
+	width: 22px;
+	height: 34px;
+	border: 1.5px solid var(--q2-text-muted);
+	border-radius: 12px;
+	position: relative;
+}
+
+.hero-scroll-cue-dot {
+	position: absolute;
+	top: 6px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 3px;
+	height: 7px;
+	border-radius: 2px;
+	background: var(--q2-accent);
+	animation: q2-scroll-cue-dot 2.4s steps(4) infinite;
+}
+
+@keyframes q2-scroll-cue-bob {
+	0%, 100% { transform: translate(-50%, 0); }
+	50% { transform: translate(-50%, 6px); }
+}
+
+@keyframes q2-scroll-cue-dot {
+	0% { opacity: 1; top: 6px; }
+	80%, 100% { opacity: 0; top: 19px; }
+}
+
+@media (max-width: 800px) {
+	.hero-scroll-cue {
+		display: none;
+	}
+}
+
+.portfolio-hero-grid {
+	display: grid;
+	grid-template-columns: 0.85fr 1.15fr;
+	gap: 2rem;
+	align-items: center;
+}
+
+.portfolio-hero-copy,
+.hero-terminal-wrap {
+	position: relative;
+	z-index: 1;
+}
+
+.portfolio-badge-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	margin-bottom: 1rem;
+}
+
+.portfolio-badge {
+	display: inline-block;
+	padding: 0.35rem 0.8rem;
+	border-radius: 999px;
+	background: rgba(37, 99, 235, 0.12);
+	color: #2563eb;
+	font-weight: 700;
+}
+
+.portfolio-badge-row .portfolio-badge {
+	margin-bottom: 0;
+}
+
+/* Command-center-style "is it up" status pill next to the hero badge. */
+.hero-status-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.35rem 0.8rem;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, #22c55e 35%, transparent);
+	background: color-mix(in srgb, #22c55e 12%, transparent);
+	color: #16a34a;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+:root[data-theme="dark"] .hero-status-pill {
+	color: #4ade80;
+}
+
+.hero-status-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 999px;
+	background: #22c55e;
+	box-shadow: 0 0 0 rgba(34, 197, 94, 0.6);
+	animation: hero-status-pulse 3.5s steps(5) infinite;
+}
+
+@keyframes hero-status-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+	70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Quick stat strip under the highlight tags — a bit of command-center
+   flavor and something concrete to look at besides text. */
+.hero-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.75rem;
+	margin-top: 2rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--muted-border-color);
+}
+
+.hero-stat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+
+.hero-stat-value {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--q2-accent);
+}
+
+.hero-stat-label {
+	font-size: 0.78rem;
+	color: var(--q2-text-muted);
+}
+
+.portfolio-hero h1 {
+	font-size: clamp(2.4rem, 5vw, 4.6rem);
+	margin-bottom: 1rem;
+}
+
+.typewriter-heading {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.typewriter-cursor {
+	display: inline-block;
+	width: 0.09em;
+	height: 0.85em;
+	margin-left: 0.05em;
+	background: currentColor;
+	vertical-align: -0.1em;
+	animation: typewriter-blink 1s step-end infinite;
+}
+
+@keyframes typewriter-blink {
+	0%, 50% { opacity: 1; }
+	50.01%, 100% { opacity: 0; }
+}
+
+.portfolio-hero .lead {
+	font-size: 1.25rem;
+	color: var(--muted-color);
+	max-width: 48rem;
+}
+
+.terminal-window {
+	height: clamp(520px, 62vh, 680px);
+	min-height: 380px;
+	border-radius: 0.6rem;
+	background: rgba(2, 6, 23, 0.52);
+	backdrop-filter: blur(10px) saturate(140%);
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	box-shadow: 0 30px 80px rgba(15, 23, 42, 0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+:root[data-theme="light"] .terminal-window {
+	background: rgba(248, 250, 252, 0.72);
+	border-color: rgba(15, 23, 42, 0.14);
+	box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+:root[data-theme="light"] .terminal-topbar {
+	background: rgba(226, 232, 240, 0.55);
+	border-bottom-color: rgba(15, 23, 42, 0.1);
+}
+
+:root[data-theme="light"] .terminal-title {
+	color: rgba(51, 65, 85, 0.8);
+}
+
+:root[data-theme="light"] .term-btn {
+	background: rgba(15, 23, 42, 0.06);
+	color: rgba(15, 23, 42, 0.65);
+}
+
+:root[data-theme="light"] .term-btn:hover {
+	background: rgba(15, 23, 42, 0.12);
+	color: #0f172a;
+}
+
+:root[data-theme="light"] .terminal-body {
+	color: #0f172a;
+}
+
+:root[data-theme="light"] .prompt {
+	color: #0369a1;
+}
+
+:root[data-theme="light"] .answer {
+	color: #15803d;
+}
+
+:root[data-theme="light"] .answer.muted {
+	color: rgba(51, 65, 85, 0.65);
+}
+
+:root[data-theme="light"] .answer.error {
+	color: #dc2626;
+}
+
+:root[data-theme="light"] #terminal-input {
+	color: #0f172a;
+	caret-color: #0369a1;
+}
+
+.terminal-topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.4rem 0.75rem;
+	background: rgba(15, 23, 42, 0.4);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+	flex-shrink: 0;
+}
+
+.terminal-title {
+	color: rgba(148, 163, 184, 0.75);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.8rem;
+}
+
+.terminal-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+}
+
+.term-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	border-radius: 0.4rem;
+	background: rgba(148, 163, 184, 0.12);
+	color: rgba(226, 232, 240, 0.85);
+	font-size: 0.7rem;
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.term-btn:hover {
+	background: rgba(148, 163, 184, 0.24);
+	color: #fff;
+}
+
+.term-btn-close:hover {
+	background: #ef4444;
+	color: #fff;
+}
+
+.terminal-body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 1.2rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.95rem;
+	line-height: 1.9;
+	color: #dbeafe;
+	cursor: text;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.terminal-body::-webkit-scrollbar {
+	width: 8px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+	background: rgba(148, 163, 184, 0.35);
+	border-radius: 999px;
+}
+
+/* Minimize: the terminal hides (JS sets display:none) and this button
+   appears next to "Bekijk projecten" so it can be brought back. It's a
+   plain .button.primary in markup now (see hero raw.md) so it's pixel
+   -identical to the other CTAs — this class only still exists as a JS/CSS
+   hook (#terminal-restore-btn id + .hidden toggling). */
+
+/* Maximize: break out of the hero card into a large centered overlay —
+   gives enough room to comfortably play a game like Snake. */
+#portfolio-terminal.terminal-maximized {
+	position: fixed;
+	inset: 6vh 6vw;
+	left: 6vw;
+	right: 6vw;
+	top: 6vh;
+	bottom: 6vh;
+	height: auto;
+	width: auto;
+	z-index: 210;
+	box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(2, 6, 23, 0.65);
+	backdrop-filter: blur(4px);
+	z-index: 200;
+}
+
+.terminal-game-canvas {
+	display: block;
+	margin: 0.5rem auto;
+	background: #020617;
+	border-radius: 0.5rem;
+	border: 1px solid rgba(148, 163, 184, 0.18);
+	outline: none;
+	max-width: 100%;
+}
+
+.terminal-game-hint {
+	text-align: center;
+}
+
+.prompt {
+	color: #38bdf8;
+	margin-right: 0.5rem;
+}
+
+.answer {
+	color: #86efac;
+	padding-left: 0.2rem;
+}
+
+.answer.muted {
+	color: rgba(148, 163, 184, 0.7);
+}
+
+.answer.error {
+	color: #f87171;
+}
+
+.terminal-input-line {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+}
+
+/*
+ * ID selector needed: theme.css styles input[type="text"] globally
+ * (background/border/padding/width:100%) with higher specificity than a
+ * plain class, which was making this look like a visible search-bar-style
+ * input instead of a bare terminal cursor.
+ */
+#terminal-input {
+	flex: 1;
+	width: auto;
+	background: transparent;
+	border: none;
+	outline: none;
+	box-shadow: none;
+	color: #dbeafe;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: normal;
+	vertical-align: baseline;
+	padding: 0;
+	margin: 0;
+	caret-color: #38bdf8;
+}
+
+#terminal-input:focus {
+	border: none;
+	box-shadow: none;
+}
+
+.portfolio-actions {
+	display: flex;
+	/* center, not stretch: both buttons already share a fixed min-height
+	   via .button, so their size no longer depends on whether a sibling
+	   button is present/hidden (e.g. toggling the terminal minimize). */
+	align-items: center;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+	margin: 1.75rem 0;
+}
+
+/*
+ * Base button component — the theme itself provides no .button styling at
+ * all, so any <a class="button"> was rendering as a bare underlined link.
+ */
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	box-sizing: border-box;
+	height: 2.85rem;
+	padding: 0 1.4rem;
+	border-radius: 0.75rem;
+	border: 1px solid var(--muted-border-color);
+	background: var(--card-background-color);
+	color: var(--q2-text-strong);
+	font-weight: 600;
+	text-decoration: none !important;
+	line-height: 1;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button i {
+	line-height: 1;
+}
+
+.button:hover {
+	border-color: var(--q2-accent);
+	color: var(--q2-accent);
+	transform: translateY(-2px);
+	box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--q2-accent) 45%, transparent);
+}
+
+.button.primary {
+	background: var(--q2-accent);
+	border-color: color-mix(in srgb, var(--q2-accent) 55%, white 45%);
+	color: #fff;
+	box-shadow: 0 0 0 1px color-mix(in srgb, var(--q2-accent) 45%, transparent);
+}
+
+.button.primary:hover {
+	filter: brightness(1.08);
+	color: #fff;
+}
+
+/* Small "→" that slides out on hover, for inline "read more"-style links. */
+.button-more::after {
+	content: '\2192';
+	display: inline-block;
+	transition: transform 0.2s ease;
+}
+
+.button-more:hover::after {
+	transform: translateX(3px);
+}
+
+.portfolio-highlights {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	list-style: none;
+	padding: 0;
+	margin: 2rem 0 0;
+}
+
+.portfolio-highlights li {
+	padding: 0.6rem 0.9rem;
+	border: 1px solid var(--muted-border-color);
+	border-radius: 999px;
+	background: var(--card-background-color);
+}
+
+.portfolio-section {
+	padding: 0.35rem 0;
+}
+
+/*
+ * Each modular home-page block (over mij, skills, ervaring, projecten,
+ * contact) now stands on its own — there's no shared #body-wrapper card
+ * around the whole page anymore. Give these blocks their own floating
+ * glass card so they read as distinct, individually movable blocks with
+ * the ambient background visible in the gaps between them.
+ */
+.module-card {
+	background: color-mix(in srgb, var(--q2-bg-elev) 74%, transparent);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(148, 163, 184, 0.16);
+	border-radius: 2rem;
+	padding: clamp(1.75rem, 4vw, 3rem);
+	box-shadow: 0 24px 60px rgba(15, 23, 42, 0.10);
+	margin-block: 0.6rem;
+}
+
+.module-card > :first-child {
+	margin-top: 0;
+}
+
+.module-card > :last-child {
+	margin-bottom: 0;
+}
+
+.section-intro {
+	max-width: 46rem;
+	color: var(--muted-color);
+	margin-bottom: 1.25rem;
+}
+
+.portfolio-grid.two {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+.portfolio-grid + p {
+	margin-top: 1.75rem;
+}
+
+.portfolio-grid.three {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+	.portfolio-grid.three {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.portfolio-card,
+.portfolio-contact-card {
+	padding: 1.5rem;
+	border: 1px solid color-mix(in srgb, var(--q2-text) 14%, transparent);
+	border-radius: 1.25rem;
+	background: color-mix(in srgb, var(--card-background-color) 88%, white 12%);
+	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-theme="dark"] .portfolio-card,
+:root[data-theme="dark"] .portfolio-contact-card {
+	background: color-mix(in srgb, var(--q2-bg-elev) 92%, white 4%);
+	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.portfolio-split-card {
+	display: grid;
+	grid-template-columns: 0.8fr 1.2fr;
+	gap: 1.5rem;
+	align-items: start;
+	padding: clamp(1.75rem, 4vw, 3rem);
+	border-radius: 2rem;
+	background: color-mix(in srgb, var(--q2-bg-elev) 74%, transparent);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(148, 163, 184, 0.16);
+	box-shadow: 0 24px 60px rgba(15, 23, 42, 0.10);
+	margin-block: 0.6rem;
+}
+
+.aboutme-plugin-wrapper {
+	padding: 0.25rem;
+}
+
+.aboutme-plugin-wrapper .aboutme {
+	background: linear-gradient(180deg, color-mix(in srgb, var(--q2-bg-elev) 92%, transparent), color-mix(in srgb, var(--q2-bg-muted) 92%, transparent));
+	border-radius: 1.2rem;
+	padding: 1.5rem;
+	border: 1px solid rgba(148, 163, 184, 0.16);
+	box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+}
+
+.navbar-wordmark::after {
+	content: '.';
+	color: var(--q2-accent);
+}
+
+.about-me {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+}
+
+.about-me .u-photo {
+	width: 96px;
+	height: 96px;
+	border-radius: 999px;
+	object-fit: cover;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	margin-bottom: 0.5rem;
+}
+
+.about-me .aboutme-initials {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, var(--q2-accent), #38bdf8);
+	color: #fff;
+	font-family: var(--pico-font-family-display);
+	font-weight: 700;
+	font-size: 2rem;
+	letter-spacing: 0.05em;
+}
+
+.about-me h3 {
+	margin: 0 0 0.75rem;
+	font-weight: 600;
+	color: var(--muted-color);
+}
+
+.about-me .social-pages {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 0.6rem;
+	margin-top: 0.75rem;
+	width: 100%;
+}
+
+.about-me .social-pages a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--q2-bg-muted) 80%, transparent);
+	color: var(--q2-text-strong);
+	transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.about-me .social-pages a i {
+	font-size: 1rem;
+}
+
+.about-me .social-pages a:hover {
+	background: var(--q2-accent);
+	color: #fff;
+	transform: translateY(-2px);
+}
+
+.aboutme-plugin-wrapper img {
+	border-radius: 1rem;
+}
+
+body.portfolio-page #body-wrapper > .container > .content-item,
+body.portfolio-subpage #body-wrapper > .container > .content-item {
+	background: color-mix(in srgb, var(--q2-bg-elev) 74%, transparent);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(148, 163, 184, 0.16);
+	border-radius: 2rem;
+	padding: 2rem;
+	box-shadow: 0 24px 60px rgba(15, 23, 42, 0.10);
+}
+
+.portfolio-card h3 {
+	margin-top: 0;
+}
+
+/* Project cards — hover lift + glow, distinct from the plain .portfolio-card
+   used elsewhere (skills groups) so this only affects the projects grid. */
+.project-card {
+	transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.project-card:hover {
+	transform: translateY(-6px);
+	border-color: var(--q2-accent);
+	box-shadow: 0 24px 48px rgba(37, 99, 235, 0.18);
+}
+
+/* Animated icon tile — replaces the old static SVG illustration. Small
+   line-art icon with a couple of looping details (blinking rack LEDs,
+   a terminal prompt animating in) instead of a still picture. */
+.project-icon-tile {
+	width: 100%;
+	max-width: 180px;
+	aspect-ratio: 1;
+	margin: 0 auto 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--q2-bg-muted) 92%, var(--q2-accent) 6%);
+	border: 1px solid var(--muted-border-color);
+}
+
+.project-icon {
+	width: 62%;
+	height: 62%;
+}
+
+.project-icon-frame {
+	fill: none;
+	stroke: var(--q2-text-muted);
+	stroke-width: 2;
+}
+
+.project-icon-unit {
+	fill: color-mix(in srgb, var(--q2-bg-elev) 80%, transparent);
+	stroke: var(--q2-text-muted);
+	stroke-width: 1.5;
+}
+
+/* The muted gray line-art (rack frame, unit bars) reads fine on the dark
+   theme's near-black tile, but washes out against the light theme's
+   near-white one — use the stronger text color there instead. */
+:root[data-theme="light"] .project-icon-frame,
+:root[data-theme="light"] .project-icon-unit {
+	stroke: var(--q2-text);
+}
+
+:root[data-theme="light"] .project-icon-dot {
+	fill: var(--q2-text);
+}
+
+:root[data-theme="light"] .project-icon-track {
+	fill: color-mix(in srgb, var(--q2-text) 30%, transparent);
+}
+
+.project-icon-led {
+	fill: #22c55e;
+	animation: q2-led-blink 4s steps(5) infinite;
+}
+
+.project-icon-led--2 { animation-delay: -0.8s; }
+.project-icon-led--3 { animation-delay: -1.6s; }
+
+.project-icon-stroke {
+	fill: none;
+	stroke: var(--q2-accent);
+	stroke-width: 3;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* .project-icon-prompt used to animate in via stroke-dashoffset (a
+   "typing" draw-in effect) — removed because animating that property
+   can't be composited by the GPU; it forces a full vector
+   re-rasterization on every single frame, which profiling traced as a
+   real, sustained cost even for a single visible icon. The chevron is
+   just drawn in fully now (plain .project-icon-stroke styling covers it);
+   .project-icon-cursor below still blinks (a cheap opacity animation) so
+   the icon isn't fully static. */
+
+.project-icon-cursor {
+	animation: q2-cursor-blink 1s step-end infinite;
+}
+
+.project-icon-dot {
+	fill: var(--q2-text-muted);
+}
+
+.project-icon-track {
+	fill: color-mix(in srgb, var(--q2-text-muted) 30%, transparent);
+}
+
+.project-icon-bar-fill {
+	fill: var(--q2-accent);
+	transform-box: fill-box;
+	transform-origin: left center;
+	animation: q2-bar-grow 4s steps(5) infinite;
+}
+
+.project-icon-ping {
+	fill: none;
+	stroke: var(--q2-accent);
+	stroke-width: 2;
+	transform-box: fill-box;
+	transform-origin: center;
+	animation: q2-ping 3.5s steps(5) infinite;
+}
+
+@keyframes q2-led-blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.25; }
+}
+
+@keyframes q2-cursor-blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
+
+@keyframes q2-bar-grow {
+	0%, 100% { transform: scaleX(0.15); }
+	50% { transform: scaleX(1); }
+}
+
+@keyframes q2-ping {
+	0% { transform: scale(1); opacity: 0.8; }
+	80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+
+/* Tech-stack tags stagger in once the section is visible, same pattern as
+   the skill-card grid. */
+.project-card .tags .label {
+	opacity: 0;
+	transform: translateY(10px);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.portfolio-page .portfolio-section.is-visible .project-card .tags .label,
+body.portfolio-subpage .portfolio-section.is-visible .project-card .tags .label {
+	opacity: 1;
+	transform: translateY(0);
+	transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.2s ease;
+}
+
+.project-card .tags .label:nth-child(1) { transition-delay: 0.05s; }
+.project-card .tags .label:nth-child(2) { transition-delay: 0.12s; }
+.project-card .tags .label:nth-child(3) { transition-delay: 0.19s; }
+.project-card .tags .label:nth-child(4) { transition-delay: 0.26s; }
+
+@media (prefers-reduced-motion: reduce) {
+	.project-card .tags .label {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}
+
+.portfolio-image {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 1rem;
+	margin-bottom: 1rem;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+}
+
+/* Real portrait photo (over mij) — keep it a tidy portrait rectangle
+   instead of stretching to the illustrations' wide landscape ratio. */
+.portfolio-portrait {
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	object-position: top center;
+}
+
+/* The standalone section illustrations (skills/experience/contact) span a
+   full-width block instead of a half-width grid card, so they need a cap
+   or they render huge. */
+/* Pairs a section illustration with its content side by side instead of
+   a small image floating centered above/between text — reads as part of
+   the layout rather than a disconnected sticker. */
+.portfolio-visual-split {
+	display: grid;
+	grid-template-columns: minmax(160px, 260px) minmax(0, 640px);
+	gap: 2rem;
+	align-items: center;
+	margin-top: 1.25rem;
+}
+
+/* Skills/experience pair the illustration with a card grid, not plain
+   text — that needs the room the 640px text cap would otherwise deny it. */
+.portfolio-visual-split:has(.portfolio-grid) {
+	grid-template-columns: minmax(160px, 260px) minmax(0, 1fr);
+}
+
+/* Reverse layout — wide content on the left, illustration on the right
+   (e.g. "Wie ik ben", where the tabs need the room). */
+.portfolio-visual-split--reverse {
+	grid-template-columns: minmax(0, 1fr) minmax(160px, 260px);
+}
+
+@media (max-width: 800px) {
+	.portfolio-visual-split--reverse {
+		grid-template-columns: 1fr;
+	}
+	.portfolio-visual-split--reverse > .portfolio-image {
+		order: -1;
+	}
+}
+
+.portfolio-visual-split > .portfolio-image {
+	width: 100%;
+	margin: 0;
+}
+
+@media (max-width: 800px) {
+	.portfolio-visual-split {
+		grid-template-columns: 1fr;
+	}
+
+	.portfolio-visual-split > .portfolio-image {
+		max-width: 220px;
+		margin-inline: auto;
+	}
+}
+
+/* Project card thumbnails were still stretching to the full card width
+   (very large on wide screens) — cap them like the banner illustrations. */
+.portfolio-card .portfolio-image {
+	max-width: 220px;
+	margin-inline: auto;
+}
+
+.timeline-card .muted,
+.portfolio-card .muted {
+	color: var(--muted-color);
+}
+
+.contact-section {
+	padding-bottom: 4rem;
+}
+
+/* Live tech-news feed — server-rendered RSS list styled as a small
+   console/terminal panel, with a pulsing LIVE badge for the command-center
+   feel. Data actually refreshes every 30 min (server-side cache), not
+   per-second — the pulse is honest about "periodically live", not a claim
+   of real-time streaming. */
+.tech-feed-card {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.tech-feed-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.tech-feed-heading h2 {
+	margin-bottom: 0;
+}
+
+.tech-feed-live {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.15em;
+	color: #22c55e;
+	white-space: nowrap;
+}
+
+.tech-feed-live-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 999px;
+	background: #22c55e;
+	box-shadow: 0 0 0 rgba(34, 197, 94, 0.6);
+	animation: q2-live-pulse 3.5s steps(5) infinite;
+}
+
+@keyframes q2-live-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+	70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.tech-feed-body {
+	display: grid;
+	grid-template-columns: 1.7fr 1fr;
+	gap: 1.25rem;
+	margin-top: 1.25rem;
+	align-items: start;
+}
+
+/* Panel chrome — a distinct inset "device" around the list, echoing the
+   terminal window elsewhere on the site, so the feed reads as a small
+   dashboard rather than a plain bulleted list. */
+.tech-feed-panel {
+	margin-top: 0;
+	border-radius: 1rem;
+	border: 1px solid var(--muted-border-color);
+	background: color-mix(in srgb, var(--q2-bg) 60%, var(--q2-bg-muted) 40%);
+	overflow: hidden;
+}
+
+.tech-feed-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.tech-feed-stats {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.6rem;
+}
+
+.tech-feed-stat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.7rem 0.6rem;
+	border-radius: 0.75rem;
+	border: 1px solid var(--muted-border-color);
+	background: var(--q2-bg-muted);
+	text-align: center;
+}
+
+.tech-feed-stat-value {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: var(--q2-accent);
+	white-space: nowrap;
+}
+
+.tech-feed-stat-label {
+	font-size: 0.65rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--q2-text-muted);
+}
+
+.tech-feed-chart {
+	padding: 0.9rem 1rem 1rem;
+	border-radius: 1rem;
+	border: 1px solid var(--muted-border-color);
+	background: color-mix(in srgb, var(--q2-bg) 60%, var(--q2-bg-muted) 40%);
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+}
+
+.tech-feed-chart-title {
+	font-size: 0.65rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--q2-text-muted);
+	margin-bottom: 0.2rem;
+}
+
+.tech-feed-chart-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 2.4fr auto;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.7rem;
+}
+
+.tech-feed-chart-label {
+	color: var(--q2-text-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.tech-feed-chart-track {
+	height: 6px;
+	border-radius: 999px;
+	background: var(--q2-bg);
+	overflow: hidden;
+}
+
+.tech-feed-chart-fill {
+	height: 100%;
+	width: var(--pct, 0%);
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--q2-accent), #38bdf8);
+	transition: width 0.6s ease;
+}
+
+.tech-feed-chart-count {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	color: var(--q2-text-strong);
+	text-align: right;
+}
+
+@media (max-width: 900px) {
+	.tech-feed-body {
+		grid-template-columns: 1fr;
+	}
+}
+
+.tech-feed-panel-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.6rem 1rem;
+	background: var(--q2-bg-muted);
+	border-bottom: 1px solid var(--muted-border-color);
+	font-size: 0.7rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--q2-text-muted);
+}
+
+.tech-feed-panel-source {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--q2-text-strong);
+}
+
+.tech-feed-panel-source i {
+	color: var(--q2-accent);
+}
+
+.tech-feed-list {
+	list-style: none;
+	padding: 0.6rem;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	max-height: 32rem;
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: var(--q2-accent) transparent;
+}
+
+.tech-feed-list::-webkit-scrollbar {
+	width: 6px;
+}
+
+.tech-feed-list::-webkit-scrollbar-thumb {
+	background: var(--q2-accent);
+	border-radius: 999px;
+}
+
+.tech-feed-list::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.tech-feed-item {
+	position: relative;
+	padding: 0.7rem 0.9rem 0.7rem 1.1rem;
+	border-radius: 0.65rem;
+	background: var(--q2-bg-elev);
+	border: 1px solid var(--muted-border-color);
+	border-left: 3px solid var(--q2-accent);
+	font-size: 0.85rem;
+	transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tech-feed-item:hover {
+	border-left-color: var(--q2-accent);
+	transform: translateX(2px);
+}
+
+.tech-feed-item-top {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.tech-feed-item a {
+	color: var(--q2-text-strong);
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.tech-feed-item a:hover {
+	color: var(--q2-accent);
+	text-decoration: underline;
+}
+
+.tech-feed-time {
+	flex: none;
+	color: var(--q2-text-muted);
+	font-size: 0.75rem;
+}
+
+.tech-feed-item-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-top: 0.4rem;
+}
+
+.tech-feed-badge,
+.tech-feed-source-tag {
+	display: inline-flex;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	padding: 0.1rem 0.45rem;
+	border-radius: 999px;
+}
+
+.tech-feed-source-tag {
+	background: var(--q2-bg-muted);
+	color: var(--q2-text-muted);
+	border: 1px solid var(--muted-border-color);
+	text-transform: uppercase;
+}
+
+.tech-feed-badge--new {
+	background: color-mix(in srgb, #22c55e 20%, transparent);
+	color: #22c55e;
+	border: 1px solid color-mix(in srgb, #22c55e 40%, transparent);
+}
+
+.tech-feed-empty {
+	color: var(--q2-text-muted);
+	font-style: italic;
+	border-left-color: var(--muted-border-color);
+}
+
+@media (max-width: 600px) {
+	.tech-feed-item-top {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+	}
+	.tech-feed-item a {
+		max-width: 100%;
+		white-space: normal;
+	}
+}
+
+@media (max-width: 800px) {
+	.portfolio-hero-grid,
+	.portfolio-split-card,
+	.portfolio-grid.two,
+	.portfolio-grid.three {
+		grid-template-columns: 1fr;
+	}
+
+	.terminal-window {
+		height: 440px;
+	}
+
+	#portfolio-terminal.terminal-maximized {
+		inset: 3vh 3vw;
+		left: 3vw;
+		right: 3vw;
+		top: 3vh;
+		bottom: 3vh;
+		height: auto;
+	}
+}
+
+.lang-switcher {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.navbar-section.actions .lang-switcher {
+	margin-right: 0.5rem;
+	padding-right: 0.5rem;
+	border-right: 1px solid var(--muted-border-color);
+}
+
+.lang-link {
+	padding: 0.3rem 0.5rem;
+	border-radius: 0.5rem;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: var(--q2-text-muted);
+	text-decoration: none !important;
+}
+
+.lang-link:hover {
+	color: var(--q2-accent);
+}
+
+.lang-link.active {
+	background: color-mix(in srgb, var(--q2-accent) 14%, transparent);
+	color: var(--q2-accent);
+}
+
+/* Contact form card — now shares the .module-card floating-glass chrome
+   (background/border/radius/shadow) used across the rest of the portfolio,
+   so this only scopes the form's own layout. */
+.contact-form-heading {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin-top: 0;
+	color: var(--q2-accent);
+}
+
+.contact-form-card .form-wrapper {
+	max-width: 560px;
+}
+
+.contact-form-card .form-field {
+	margin-bottom: 1.25rem;
+}
+
+.contact-form-card .form-label {
+	display: block;
+	margin-bottom: 0.4rem;
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: var(--q2-text-strong);
+}
+
+.contact-form-card .form-label .required {
+	color: var(--q2-accent);
+	margin-left: 0.2rem;
+}
+
+.contact-form-card textarea.form-input {
+	min-height: 140px;
+	resize: vertical;
+}
+
+.contact-form-card .form-input-prepend {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin-bottom: 0.6rem;
+}
+
+.contact-form-card .form-input-prepend img {
+	border-radius: 0.5rem;
+	border: 1px solid var(--muted-border-color);
+}
+
+.contact-form-card button[type="submit"] {
+	background: var(--q2-accent);
+	border-color: var(--q2-accent);
+	color: #fff;
+	border-radius: 0.75rem;
+	padding: 0.7rem 1.4rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: filter 0.15s ease;
+}
+
+.contact-form-card button[type="submit"]:hover {
+	filter: brightness(1.08);
+}
+
+/* =========================================================================
+   Secret Lab — a self-contained "game launcher" (Steam/Epic-style) rather
+   than a content page that happens to embed games. Deliberately always
+   dark regardless of the site's own light/dark toggle — like every real
+   game launcher is — so the portal and every individual game page read as
+   one consistent app.
+   ========================================================================= */
+
+/* This section is always dark regardless of the site's own toggle (see
+   color-scheme: dark above), so the toggle button itself would be a dead
+   control here — hide it rather than let it imply a choice that does
+   nothing. */
+body.secret-lab-portal-page [data-theme-toggle],
+body.secret-lab-game-page [data-theme-toggle] {
+	display: none;
+}
+
+body.secret-lab-portal-page,
+body.secret-lab-game-page {
+	--lab-bg: #080b12;
+	--lab-surface: rgba(255, 255, 255, 0.04);
+	--lab-surface-strong: rgba(255, 255, 255, 0.075);
+	--lab-border: rgba(148, 163, 184, 0.16);
+	--lab-border-strong: rgba(148, 163, 184, 0.32);
+	--lab-text: #eef1f8;
+	--lab-muted: #8b93a8;
+	--lab-accent: var(--q2-accent);
+	--lab-accent-soft: color-mix(in oklab, var(--lab-accent) 18%, transparent);
+	--lab-accent-glow: color-mix(in oklab, var(--lab-accent) 55%, transparent);
+	color-scheme: dark;
+	background: var(--lab-bg);
+	color: var(--lab-text);
+	/* Establishes this element as the containing block for the ::before
+	   background below, so "inset: 0" spans the full scrollable page
+	   (this element's real height) instead of just one viewport's worth. */
+	position: relative;
+}
+
+/* The homepage's colorful ambient blobs (plus our own earlier glow layer)
+   read as a hazy smudge sitting in a fixed spot on top of the crisp grid
+   below — removed outright rather than just dimmed. */
+body.secret-lab-portal-page .ambient-bg,
+body.secret-lab-game-page .ambient-bg {
+	display: none;
+}
+
+/* A drifting "digital floor" grid plus a starfield of small glowing
+   particles, like a HUD backdrop — cheap (no image assets) and reads as
+   "game launcher" rather than "content page". position:absolute (not
+   fixed) so it's part of the page itself and scrolls along with it,
+   rather than staying pinned to the viewport. Every particle layer shifts
+   by the same pixel delta in labGridDrift, but each has a different tile
+   size, so they wrap around at different rates — a cheap parallax
+   illusion with one animation. */
+body.secret-lab-portal-page::before,
+body.secret-lab-game-page::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background-image:
+		radial-gradient(2.4px 2.4px at 20% 30%, var(--lab-accent), transparent 100%),
+		radial-gradient(2px 2px at 70% 65%, #ffffff, transparent 100%),
+		radial-gradient(2.4px 2.4px at 42% 82%, var(--lab-accent), transparent 100%),
+		radial-gradient(2px 2px at 85% 20%, #ffffff, transparent 100%),
+		radial-gradient(1.8px 1.8px at 12% 78%, #ffffff, transparent 100%),
+		radial-gradient(2.2px 2.2px at 92% 48%, var(--lab-accent), transparent 100%),
+		radial-gradient(1.8px 1.8px at 55% 45%, #ffffff, transparent 100%),
+		radial-gradient(2px 2px at 30% 55%, var(--lab-accent), transparent 100%),
+		linear-gradient(var(--lab-border-strong) 1px, transparent 1px),
+		linear-gradient(90deg, var(--lab-border-strong) 1px, transparent 1px);
+	background-size:
+		320px 320px, 260px 260px, 400px 400px, 340px 340px, 220px 220px, 380px 380px,
+		300px 300px, 360px 360px,
+		48px 48px, 48px 48px;
+	background-repeat: repeat;
+	opacity: 0.8;
+	animation: labGridDrift 16s linear infinite;
+}
+
+
+@keyframes labGridDrift {
+	from { background-position: 0 0; }
+	to { background-position: 640px 640px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.secret-lab-portal-page::before,
+	body.secret-lab-game-page::before {
+		animation: none;
+	}
+}
+
+/* Floating game-tile accents (see initBgTiles in secret-lab.js) — rounded
+   squares, same shape language as the actual Snake/2048 tiles, scattered
+   down the page so different ones drift into view as you scroll. */
+.secret-lab-bg-tiles {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.secret-lab-bg-tile {
+	position: absolute;
+	border-radius: 22%;
+	opacity: 0.16;
+	filter: blur(0.3px);
+	box-shadow: 0 0 24px 4px currentColor;
+	color: inherit;
+	animation: labTileFloat 7s ease-in-out infinite;
+}
+
+@keyframes labTileFloat {
+	0%, 100% { transform: translateY(0) rotate(0deg); }
+	50% { transform: translateY(-16px) rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.secret-lab-bg-tile {
+		animation: none;
+	}
+}
+
+.secret-lab-locked {
+	min-height: 70vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 0.6rem;
+	padding: 3rem 1.5rem;
+}
+
+.secret-lab-locked h1 {
+	font-size: 2rem;
+	margin: 0;
+}
+
+.secret-lab-locked p {
+	color: var(--lab-muted);
+	max-width: 30rem;
+}
+
+.secret-lab-content {
+	text-align: center;
+}
+
+/* The portal's own title/intro/featured-hero sat inside the theme's normal
+   constrained .container width while .secret-lab-portal breaks out to full
+   viewport width below it — same content, two different widths side by
+   side. Give the header block the same full-bleed treatment. */
+body.secret-lab-portal-page #secret-lab-content > h1,
+body.secret-lab-portal-page .section-intro,
+body.secret-lab-portal-page .secret-lab-featured {
+	width: 100vw;
+	max-width: 100vw;
+	margin-inline: calc(50% - 50vw);
+	padding-inline: clamp(1rem, 4vw, 3rem);
+	box-sizing: border-box;
+}
+
+/* .section-intro's site-wide 46rem cap (for readable paragraphs elsewhere)
+   left this one narrow and centered against the now full-width title/hero
+   around it, wrapping awkwardly ("devel-\nopment") instead of sitting flush
+   with everything else. */
+body.secret-lab-portal-page .section-intro {
+	max-width: none;
+}
+
+.secret-lab-game-wrap {
+	display: flex;
+	justify-content: center;
+	margin: 1.5rem 0;
+}
+
+.secret-lab-canvas-el {
+	max-width: 100%;
+	background: #020617;
+	border-radius: 0.75rem;
+	border: 1px solid var(--lab-border-strong);
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.secret-lab-hint {
+	color: var(--lab-muted);
+}
+
+.secret-lab-game-wrap--iframe {
+	display: block;
+}
+
+/* Game pages: top nav, a small title + short info line, then a wide framed
+   game panel (toolbar + iframe) filling the rest of the viewport.
+   --site-header-height is measured and set by secret-lab.js (the header is
+   sticky/in-flow, so its real height varies by breakpoint). The footer is
+   hidden on these pages (see body.secret-lab-game-page below) so this
+   min-height maps to the actual visible viewport, no extra scroll. */
+/* Game pages don't use the site's default padded/backgrounded "card", and
+   #body-wrapper's own vertical section padding is dropped too — otherwise
+   it adds height on top of the 100vh-minus-header calc below and the page
+   scrolls past the viewport even though nothing is visually cut off. */
+body.secret-lab-game-page #body-wrapper > .container > .content-item,
+body.secret-lab-portal-page #body-wrapper > .container > .content-item,
+:root[data-theme="dark"] body.secret-lab-game-page #body-wrapper > .container > .content-item,
+:root[data-theme="dark"] body.secret-lab-portal-page #body-wrapper > .container > .content-item {
+	background: none;
+	padding: 0;
+	box-shadow: none;
+	border-radius: 0;
+	border: none;
+	/* The default card look (custom.css ~L662) also sets backdrop-filter:
+	   blur(10px) — that's a real blur of whatever's rendered behind this
+	   element, so even with background:none it was smearing the grid
+	   backdrop into a hazy column right where the actual page content sits. */
+	backdrop-filter: none;
+}
+
+body.secret-lab-game-page #body-wrapper,
+body.secret-lab-portal-page #body-wrapper {
+	padding-block: 0;
+}
+
+/* The header-height ResizeObserver keeps this close but not pixel-perfect
+   (sub-pixel rounding, scrollbar-width changes, etc.) — these pages are
+   meant to exactly fill the viewport with no real content to scroll to, so
+   just suppress the residual sliver of scroll outright rather than chase
+   the last fraction of a pixel. */
+body.secret-lab-game-page {
+	overflow: hidden;
+}
+
+.secret-lab-content--game {
+	display: flex;
+	flex-direction: column;
+	min-height: calc(100vh - var(--site-header-height, 88px));
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	box-sizing: border-box;
+}
+
+/* A single visible bar (same width formula as .secret-lab-game-panel below)
+   holding the title + short info line — without its own background this
+   text used to just float over the page's ambient gradient and read as
+   "not really there". */
+.secret-lab-game-header {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	width: calc(100vw - 2rem);
+	margin: 0 0 0.6rem calc(50% - 50vw + 1rem);
+	padding: 0.75rem 1.15rem;
+	box-sizing: border-box;
+	background: linear-gradient(180deg, var(--lab-surface-strong), var(--lab-surface));
+	border: 1px solid var(--lab-border);
+	border-radius: 0.9rem;
+}
+
+.secret-lab-content--game h1 {
+	margin: 0 0 0.15rem;
+	font-size: 1.2rem;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	color: var(--lab-text);
+}
+
+.secret-lab-game-info {
+	margin: 0;
+	color: var(--lab-muted);
+	font-size: 0.85rem;
+}
+
+body.secret-lab-game-page #footer {
+	display: none;
+}
+
+/* Wide (not full-bleed) framed panel: toolbar + iframe share one border so
+   the game clearly reads as embedded in the site, not floating edge-to-edge. */
+.secret-lab-game-panel {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	width: calc(100vw - 2rem);
+	margin-inline: calc(50% - 50vw + 1rem);
+	min-height: 420px;
+	border: 1px solid var(--lab-border-strong);
+	border-radius: 0.9rem;
+	overflow: hidden;
+	box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+	background: #020617;
+}
+
+.secret-lab-game-toolbar {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: stretch;
+	gap: 0.4rem;
+	padding: 0.5rem 0.75rem;
+	background: linear-gradient(180deg, var(--lab-surface-strong), var(--lab-surface));
+	border-bottom: 1px solid var(--lab-border);
+}
+
+.secret-lab-game-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	box-sizing: border-box;
+	height: 2.2rem;
+	padding: 0 0.85rem;
+	border-radius: 999px;
+	border: 1px solid var(--lab-border-strong);
+	background: var(--lab-surface);
+	color: var(--lab-text);
+	font-family: inherit;
+	font-size: 0.8rem;
+	line-height: 1;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.secret-lab-game-btn:hover {
+	background: var(--lab-accent-soft);
+	border-color: var(--lab-accent);
+	color: #fff;
+	box-shadow: 0 0 0 3px var(--lab-accent-soft);
+}
+
+/* Pushes the "new tab" link (always last) to the toolbar's far edge,
+   separating "control the game" actions from "leave the embed" ones. */
+.secret-lab-game-toolbar a.secret-lab-game-btn:last-child {
+	margin-left: auto;
+}
+
+/* requestFullscreen() puts the panel on the OS-level fullscreen "black
+   canvas", but without these rules it keeps its normal in-page box
+   (calc(100vw - 2rem) width, centering margin, border/radius) instead of
+   actually filling the screen. */
+.secret-lab-game-panel:fullscreen,
+.secret-lab-game-panel:-webkit-full-screen {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	border: none;
+	border-radius: 0;
+}
+
+.secret-lab-game-panel:fullscreen .secret-lab-game-body,
+.secret-lab-game-panel:-webkit-full-screen .secret-lab-game-body {
+	min-height: 0;
+}
+
+.secret-lab-game-frame,
+.secret-lab-iframe {
+	display: block;
+	flex: 1 1 auto;
+	width: 100%;
+	min-height: 380px;
+	border: none;
+	background: #020617;
+}
+
+/* Canvas games (Snake, 2048): stage + a highscore sidebar, sharing the same
+   panel/toolbar chrome as the iframe games above. */
+.secret-lab-game-panel--canvas .secret-lab-game-body {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.secret-lab-game-stage {
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: auto;
+	padding: 1rem;
+}
+
+.secret-lab-game-stage--iframe {
+	padding: 0;
+}
+
+.secret-lab-game-stage--iframe .secret-lab-iframe {
+	width: 100%;
+	height: 100%;
+	min-height: 420px;
+}
+
+.secret-lab-score-submit {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	margin-top: 1.1rem;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--lab-border);
+}
+
+.secret-lab-score-submit .secret-lab-score-entry-input {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.secret-lab-canvas-el {
+	max-width: 100%;
+	background: #020617;
+	border-radius: 0.5rem;
+	border: 1px solid var(--lab-border-strong);
+}
+
+/* --- Highscore sidebar, restyled as a leaderboard card --- */
+.secret-lab-highscore-panel {
+	flex: 0 0 220px;
+	min-width: 0;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	border-left: 1px solid var(--lab-border);
+	background: linear-gradient(180deg, var(--lab-surface-strong), transparent 40%);
+	padding: 1.1rem;
+	overflow-y: auto;
+}
+
+.secret-lab-highscore-panel h3 {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0 0 0.9rem;
+	font-size: 0.78rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--lab-muted);
+}
+
+.secret-lab-highscore-panel h3::before {
+	content: '🏆';
+	font-size: 0.9rem;
+}
+
+.secret-lab-highscore-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	counter-reset: lab-rank;
+}
+
+.secret-lab-highscore-list li {
+	counter-increment: lab-rank;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.4rem 0.5rem;
+	border-radius: 0.6rem;
+	font-size: 0.85rem;
+	color: var(--lab-text);
+	transition: background 0.15s ease;
+}
+
+.secret-lab-highscore-list li:hover {
+	background: var(--lab-surface);
+}
+
+/* Rank badge: a plain numbered circle, gilded gold/silver/bronze for the
+   top 3 — the small detail that actually sells "leaderboard". */
+.secret-lab-highscore-list li::before {
+	content: counter(lab-rank);
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 50%;
+	background: var(--lab-surface-strong);
+	color: var(--lab-muted);
+	font-size: 0.72rem;
+	font-weight: 800;
+}
+
+.secret-lab-highscore-list li:nth-child(1)::before {
+	background: #f5c94233;
+	color: #ffd873;
+	box-shadow: 0 0 0 1px #f5c94255;
+}
+
+.secret-lab-highscore-list li:nth-child(2)::before {
+	background: #c9d3e033;
+	color: #dbe3f0;
+	box-shadow: 0 0 0 1px #c9d3e055;
+}
+
+.secret-lab-highscore-list li:nth-child(3)::before {
+	background: #d98a4d33;
+	color: #eaa877;
+	box-shadow: 0 0 0 1px #d98a4d55;
+}
+
+.secret-lab-highscore-name {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.secret-lab-highscore-score {
+	flex: 0 0 auto;
+	font-weight: 800;
+	color: var(--lab-accent);
+	font-variant-numeric: tabular-nums;
+}
+
+.secret-lab-highscore-empty {
+	color: var(--lab-muted);
+	font-size: 0.8rem;
+	list-style: none;
+	padding: 0.4rem 0.5rem;
+}
+
+.secret-lab-highscore-empty::before {
+	content: none;
+}
+
+.secret-lab-score-entry {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 2rem;
+	color: var(--lab-text);
+}
+
+.secret-lab-score-entry-score {
+	font-size: 1.3rem;
+	font-weight: 700;
+	margin: 0;
+}
+
+.secret-lab-score-entry-input,
+.secret-lab-score-value {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.55rem 0.8rem;
+	border-radius: 0.6rem;
+	border: 1px solid var(--lab-border-strong);
+	background: var(--lab-surface);
+	color: var(--lab-text);
+	font-size: 0.9rem;
+}
+
+.secret-lab-score-entry-input:focus {
+	outline: none;
+	border-color: var(--lab-accent);
+	box-shadow: 0 0 0 3px var(--lab-accent-soft);
+}
+
+/* Hide the up/down spinner on the (often auto-filled, read-only) score
+   number input — it's not meant to be adjusted by hand. */
+.secret-lab-score-entry-input[type="number"] {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.secret-lab-score-entry-input[type="number"]::-webkit-inner-spin-button,
+.secret-lab-score-entry-input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.secret-lab-score-entry-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+	.secret-lab-game-panel--canvas .secret-lab-game-body {
+		flex-direction: column;
+	}
+
+	.secret-lab-highscore-panel {
+		flex: 0 0 auto;
+		border-left: none;
+		border-top: 1px solid var(--lab-border);
+	}
+}
+
+/* =========================================================================
+   Portal / listing page
+   ========================================================================= */
+
+.secret-lab-portal {
+	text-align: left;
+	width: 100vw;
+	margin-inline: calc(50% - 50vw);
+	padding-inline: clamp(1rem, 4vw, 3rem);
+	padding-bottom: 4rem;
+	box-sizing: border-box;
+}
+
+.secret-lab-genre {
+	margin-bottom: 2.75rem;
+}
+
+.secret-lab-genre-title {
+	display: flex;
+	align-items: baseline;
+	gap: 0.6rem;
+	font-size: 1.05rem;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	color: var(--lab-text);
+	margin-bottom: 1.1rem;
+	padding-bottom: 0;
+	border-bottom: none;
+	position: relative;
+}
+
+/* Short accent-colored rule under the section title instead of a
+   full-width border — reads more like a launcher category label. */
+.secret-lab-genre-title::after {
+	content: '';
+	flex: 1 1 auto;
+	height: 1px;
+	margin-left: 0.4rem;
+	background: linear-gradient(90deg, var(--lab-border-strong), transparent);
+}
+
+.secret-lab-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 1.35rem;
+}
+
+.secret-lab-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+	text-align: left;
+	border-radius: 0.9rem;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.2s ease;
+}
+
+a.secret-lab-card:hover {
+	transform: translateY(-6px) scale(1.02);
+}
+
+a.secret-lab-card:focus-visible {
+	outline: 2px solid var(--lab-accent);
+	outline-offset: 4px;
+	border-radius: 0.9rem;
+}
+
+.secret-lab-card-thumb {
+	position: relative;
+	display: block;
+	border-radius: 0.85rem;
+	overflow: hidden;
+	aspect-ratio: 4 / 3;
+	background: var(--lab-surface);
+	border: 1px solid var(--lab-border);
+	box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+a.secret-lab-card:hover .secret-lab-card-thumb {
+	border-color: var(--lab-accent);
+	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 0 3px var(--lab-accent-soft);
+}
+
+.secret-lab-card-thumb img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: cover;
+	transition: transform 0.35s ease;
+}
+
+a.secret-lab-card:hover .secret-lab-card-thumb img {
+	transform: scale(1.06);
+}
+
+/* Static poster shown over a data-hover-play GIF until the card is
+   hovered — see initGamePreviews() in secret-lab.js. */
+.secret-lab-card-poster {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: opacity 0.15s ease;
+}
+
+/* Dino Run's card art is a raw 600x147 gameplay capture — full-bleed like
+   every other card (cropped via object-fit:cover, the default). */
+.secret-lab-card[href="/secret-lab/dino-run"] .secret-lab-card-thumb {
+	background: #05070c;
+}
+
+/* HexGL's title.png is a game asset (own logo/ship art) but sits on a
+   white background, not full-bleed art — same "frame it, don't crop it"
+   treatment as Dino Run so it doesn't read as a blank white tile. */
+.secret-lab-card[href="/secret-lab/hexgl"] .secret-lab-card-thumb {
+	background: #05070c;
+}
+
+.secret-lab-card[href="/secret-lab/hexgl"] .secret-lab-card-thumb img {
+	object-fit: contain;
+	padding: 0.5rem;
+	box-sizing: border-box;
+}
+
+/* Bottom scrim on every thumb — keeps the "Playable" tag readable over any
+   artwork and gives the capsule a bit of depth even before hovering. */
+.secret-lab-card-thumb::before {
+	content: '';
+	position: absolute;
+	inset: auto 0 0 0;
+	height: 45%;
+	background: linear-gradient(180deg, transparent, rgba(2, 6, 16, 0.55));
+	pointer-events: none;
+}
+
+.secret-lab-card-title {
+	font-weight: 700;
+	font-size: 0.92rem;
+	padding: 0 0.1rem;
+	color: var(--lab-text);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.secret-lab-card-tag {
+	position: absolute;
+	top: 0.55rem;
+	right: 0.55rem;
+	z-index: 1;
+	font-size: 0.62rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	padding: 0.25rem 0.6rem;
+	border-radius: 999px;
+	background: rgba(2, 6, 23, 0.75);
+	color: #e2e8f0;
+	backdrop-filter: blur(3px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secret-lab-card-tag--live {
+	background: rgba(22, 163, 74, 0.9);
+	border-color: rgba(255, 255, 255, 0.2);
+	color: #fff;
+}
+
+.secret-lab-card-tag--live::before {
+	content: '● ';
+	color: #bbf7d0;
+}
+
+.secret-lab-card--wip {
+	cursor: default;
+}
+
+.secret-lab-card--wip .secret-lab-card-thumb {
+	filter: grayscale(0.6) brightness(0.75);
+}
+
+.secret-lab-card--wip .secret-lab-card-title {
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.82rem;
+	letter-spacing: 0.02em;
+	color: var(--lab-muted);
+}
+
+.secret-lab-genre[hidden] {
+	display: none;
+}
+
+.secret-lab-card--wip .secret-lab-card-tag {
+	background: rgba(2, 6, 23, 0.75);
+	color: #fca5a5;
+}
+
+.secret-lab-card--wip .secret-lab-card-tag::before {
+	content: '🔒 ';
+}
+
+/* --- Featured hero: full-bleed cinematic banner for the first game --- */
+.secret-lab-featured {
+	position: relative;
+	display: block;
+	min-height: 280px;
+	max-width: 100%;
+	margin: 0.5rem 0 2.5rem;
+	border-radius: 1.25rem;
+	overflow: hidden;
+	text-decoration: none;
+	color: #fff;
+	border: 1px solid var(--lab-border-strong);
+	box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.secret-lab-featured:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 34px 80px rgba(0, 0, 0, 0.55), 0 0 0 3px var(--lab-accent-soft);
+}
+
+.secret-lab-featured-img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: 0;
+	transition: transform 0.4s ease;
+}
+
+.secret-lab-featured:hover .secret-lab-featured-img {
+	transform: scale(1.04);
+}
+
+/* Cinematic scrim so the copy stays legible over any artwork, brightest at
+   the bottom where the text sits, per the "Steam hero" reference. */
+.secret-lab-featured::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background:
+		linear-gradient(90deg, rgba(2, 6, 16, 0.92) 0%, rgba(2, 6, 16, 0.55) 45%, rgba(2, 6, 16, 0.15) 75%),
+		linear-gradient(0deg, rgba(2, 6, 16, 0.85), transparent 65%);
+}
+
+.secret-lab-featured-body {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	height: 100%;
+	min-height: 280px;
+	padding: 2rem clamp(1.5rem, 4vw, 3rem);
+	text-align: left;
+	box-sizing: border-box;
+}
+
+.secret-lab-featured-eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	font-weight: 800;
+	color: var(--lab-accent);
+}
+
+.secret-lab-featured-eyebrow::before {
+	content: '';
+	width: 0.45rem;
+	height: 0.45rem;
+	border-radius: 50%;
+	background: var(--lab-accent);
+	box-shadow: 0 0 12px 2px var(--lab-accent-glow);
+}
+
+.secret-lab-featured-title {
+	font-size: clamp(1.5rem, 3vw, 2.1rem);
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+.secret-lab-featured-desc {
+	color: #d6dbe8;
+	font-size: 0.95rem;
+	max-width: 42ch;
+}
+
+.secret-lab-featured-cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-top: 0.6rem;
+	width: fit-content;
+	padding: 0.65rem 1.3rem;
+	border-radius: 999px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	background: var(--lab-accent);
+	color: #fff;
+	box-shadow: 0 8px 24px var(--lab-accent-soft);
+	transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.secret-lab-featured:hover .secret-lab-featured-cta {
+	filter: brightness(1.1);
+	transform: translateX(2px);
+}
+
+/* --- Genre filter tabs --- */
+.secret-lab-filters {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.3rem;
+	max-width: 100%;
+	margin: 0 0 2rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid var(--lab-border);
+}
+
+.secret-lab-filter {
+	flex: 0 0 auto;
+	font-size: 0.82rem;
+	font-weight: 700;
+	padding: 0.5rem 0.9rem;
+	border-radius: 0.6rem;
+	border: none;
+	background: none;
+	color: var(--lab-muted);
+	cursor: pointer;
+	position: relative;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.secret-lab-filter::after {
+	content: '';
+	position: absolute;
+	left: 0.6rem;
+	right: 0.6rem;
+	bottom: -0.76rem;
+	height: 2px;
+	background: var(--lab-accent);
+	border-radius: 999px;
+	opacity: 0;
+	transform: scaleX(0.6);
+	transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.secret-lab-filter:hover {
+	background: var(--lab-surface);
+	color: var(--lab-text);
+}
+
+.secret-lab-filter.is-active {
+	background: var(--lab-surface-strong);
+	color: #fff;
+}
+
+.secret-lab-filter.is-active::after {
+	opacity: 1;
+	transform: scaleX(1);
+}
+
+@media (max-width: 640px) {
+	.secret-lab-featured,
+	.secret-lab-featured-body {
+		min-height: 220px;
+	}
+
+	.secret-lab-featured-body {
+		padding: 1.5rem 1.25rem;
+	}
+}
+
+/* Persistent "back to lab" link injected into the top nav bar on secret-lab pages */
+.secret-lab-nav-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	background: var(--q2-accent);
+	color: #fff !important;
+	padding: 0.4rem 0.9rem;
+	border-radius: 999px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.secret-lab-nav-back:hover {
+	filter: brightness(1.12);
+	transform: translateY(-1px);
+}
+
+/*
+ * Pico's base stylesheet (blades.min.css) ships a blanket
+ * `@media (prefers-reduced-motion: reduce)` rule that forces
+ * animation-duration/delay/iteration-count to ~0 with !important on
+ * almost every element. That's a reasonable default for a generic theme,
+ * but on this portfolio the decorative motion (hero shapes, scroll cue,
+ * project-card icons) is meant to always play regardless of the visitor's
+ * OS-level preference. These rules restore the real timing for just those
+ * elements. Matching Pico's selector specificity (two classes) via the
+ * doubled-class trick is required to actually win against its !important
+ * declarations — anything lower-specificity loses even when it loads later.
+ */
+@media (prefers-reduced-motion: reduce) {
+	.hero-geo.hero-geo {
+		animation-duration: 24s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.hero-geo-1.hero-geo-1 { animation-duration: 26s !important; }
+	.hero-geo-2.hero-geo-2 { animation-duration: 19s !important; }
+	.hero-geo-3.hero-geo-3 { animation-duration: 30s !important; }
+
+	.hero-scroll-cue.hero-scroll-cue {
+		animation-duration: 2.4s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.hero-scroll-cue-dot.hero-scroll-cue-dot {
+		animation-duration: 1.6s !important;
+		animation-iteration-count: infinite !important;
+	}
+
+	.typewriter-cursor.typewriter-cursor {
+		animation-duration: 1s !important;
+		animation-iteration-count: infinite !important;
+	}
+
+	.project-icon-led.project-icon-led {
+		animation-duration: 2.4s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.project-icon-led--2.project-icon-led--2 { animation-delay: -0.8s !important; }
+	.project-icon-led--3.project-icon-led--3 { animation-delay: -1.6s !important; }
+	.project-icon-cursor.project-icon-cursor {
+		animation-duration: 1s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.project-icon-bar-fill.project-icon-bar-fill {
+		animation-duration: 2.6s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.project-icon-ping.project-icon-ping {
+		animation-duration: 2.2s !important;
+		animation-iteration-count: infinite !important;
+	}
+
+	.tech-feed-live-dot.tech-feed-live-dot {
+		animation-duration: 2s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.hero-status-dot.hero-status-dot {
+		animation-duration: 2s !important;
+		animation-iteration-count: infinite !important;
+	}
+	.exp-item:first-child .exp-dot.exp-dot {
+		animation-duration: 2s !important;
+		animation-iteration-count: infinite !important;
+	}
+}
+
+/* Simple tab widget (see [data-tabs] in site.js) — e.g. the "Wie ik ben"
+   section's Werk/Homelab/Focus switcher. */
+.info-tabs {
+	margin-top: 1.5rem;
+}
+
+.info-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.info-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.55rem 1.1rem;
+	border: 1px solid var(--muted-border-color);
+	border-radius: 999px;
+	background: var(--card-background-color);
+	color: var(--q2-text-muted);
+	font-weight: 600;
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.info-tab:hover {
+	border-color: var(--q2-accent);
+	color: var(--q2-accent);
+}
+
+.info-tab[aria-selected="true"] {
+	background: var(--q2-accent);
+	border-color: var(--q2-accent);
+	color: #fff;
+}
+
+.info-tab-panel {
+	animation: info-tab-fade-in 0.25s ease;
+}
+
+@keyframes info-tab-fade-in {
+	from { opacity: 0; transform: translateY(4px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+/* Work-history timeline (Experience section) — a connecting line down the
+   left edge with a dot per role, most recent first. */
+.exp-timeline {
+	position: relative;
+	padding-left: 1.75rem;
+}
+
+.exp-timeline::before {
+	content: '';
+	position: absolute;
+	left: 5px;
+	top: 8px;
+	bottom: 8px;
+	width: 2px;
+	background: var(--muted-border-color);
+}
+
+.exp-item {
+	position: relative;
+	margin-bottom: 1.75rem;
+}
+
+.exp-item:last-child {
+	margin-bottom: 0;
+}
+
+.exp-dot {
+	position: absolute;
+	left: -1.75rem;
+	top: 6px;
+	width: 12px;
+	height: 12px;
+	border-radius: 999px;
+	background: var(--q2-accent);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--q2-accent) 18%, transparent);
+}
+
+.exp-item:first-child .exp-dot {
+	animation: hero-status-pulse 2s ease-out infinite;
+}
+
+.exp-item-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 0.9rem;
+}
+
+.exp-item-head h3 {
+	margin: 0;
+}
+
+.exp-logo {
+	width: 36px;
+	height: 36px;
+	border-radius: 0.5rem;
+	object-fit: cover;
+	border: 1px solid var(--muted-border-color);
+	background: #fff;
+	flex: none;
+}
+
+.exp-period {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.8rem;
+	color: var(--q2-text-muted);
+}
+
+.exp-item .muted {
+	color: var(--muted-color);
+}
+
+/* Click-to-reveal info popovers (see [data-info] in site.js) — skill/tag
+   cards get a small bubble with a one-line "what I use this for". */
+.has-info {
+	position: relative;
+	cursor: pointer;
+}
+
+.has-info:focus-visible {
+	outline: 2px solid var(--q2-accent);
+	outline-offset: 2px;
+}
+
+.skill-card.has-info:hover,
+.skill-card.has-info.info-open {
+	border-color: var(--q2-accent);
+	box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--q2-accent) 40%, transparent);
+}
+
+.tags .label.has-info:hover,
+.tags .label.has-info.info-open {
+	border-color: var(--q2-accent);
+	color: var(--q2-accent);
+}
+
+.info-popover {
+	position: absolute;
+	left: 50%;
+	bottom: calc(100% + 0.6rem);
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: 220px;
+	padding: 0.6rem 0.85rem;
+	border-radius: 0.65rem;
+	border: 1px solid rgba(148, 163, 184, 0.3);
+	/* Hardcoded (not var(--q2-bg-elev)/var(--q2-text)) — this element is
+	   created by JS and appended at click time, and in testing it kept
+	   rendering with light-mode colors regardless of the active theme, so
+	   it explicitly matches dark/light instead of relying on the cascade. */
+	background: #1d1f25;
+	color: #f2f2f3;
+	backdrop-filter: blur(10px);
+	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+	font-size: 0.8rem;
+	font-weight: 400;
+	line-height: 1.35;
+	text-align: left;
+	z-index: 20;
+	animation: info-popover-in 0.15s ease;
+}
+
+.info-popover::after {
+	content: '';
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 6px solid transparent;
+	border-top-color: #1d1f25;
+}
+
+:root[data-theme="light"] .info-popover {
+	background: #ffffff;
+	color: #242424;
+	border-color: rgba(15, 23, 42, 0.16);
+	box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+}
+
+:root[data-theme="light"] .info-popover::after {
+	border-top-color: #ffffff;
+}
+
+@keyframes info-popover-in {
+	from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+	to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Breathing room between the GitHub/LinkedIn card and the CTA button
+   below it in the homepage Contact teaser. */
+.portfolio-contact-card + p {
+	margin-top: 1.5rem;
+}
+
+/* Skill level bars (About me page) — qualitative levels (Growing/Solid/
+   Strong), not literal self-assessment numbers, so the bar widths are
+   rounded/approximate on purpose. */
+.skill-bars {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem 2.5rem;
+}
+
+@media (max-width: 700px) {
+	.skill-bars {
+		grid-template-columns: 1fr;
+	}
+}
+
+.skill-bar-label {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin-bottom: 0.4rem;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+.skill-bar-level {
+	font-weight: 500;
+	font-size: 0.8rem;
+	color: var(--q2-text-muted);
+}
+
+.skill-bar-track {
+	height: 8px;
+	border-radius: 999px;
+	background: var(--q2-bg-muted);
+	overflow: hidden;
+}
+
+.skill-bar-fill {
+	height: 100%;
+	width: 0;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--q2-accent), #38bdf8);
+	transition: width 1s ease;
+}
+
+body.portfolio-page .portfolio-section.is-visible .skill-bar-fill,
+body.portfolio-subpage .portfolio-section.is-visible .skill-bar-fill {
+	width: var(--level);
+}
+
+/* Cards that open the shared detail modal (see [data-modal-trigger] in
+   site.js) — a subtle hover/focus lift so it reads as clickable without
+   fighting the existing .has-info tag styling inside the same card. */
+.has-modal-trigger {
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.has-modal-trigger:hover,
+.has-modal-trigger:focus-visible {
+	transform: translateY(-3px);
+	border-color: var(--q2-accent);
+	box-shadow: 0 20px 44px -12px color-mix(in srgb, var(--q2-accent) 35%, transparent);
+	outline: none;
+}
+
+.modal-content-template {
+	display: none;
+}
+
+.detail-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(2, 6, 23, 0.65);
+	backdrop-filter: blur(4px);
+	z-index: 300;
+	animation: detail-modal-fade-in 0.2s ease;
+}
+
+.detail-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(720px, 92vw);
+	max-height: min(80vh, 820px);
+	overflow-y: auto;
+	z-index: 301;
+	padding: clamp(1.75rem, 4vw, 3rem);
+	border-radius: 1.5rem;
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	background: var(--q2-bg-elev);
+	box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+	animation: detail-modal-in 0.25s ease;
+}
+
+:root[data-theme="light"] .detail-modal {
+	background: #ffffff;
+}
+
+.detail-modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	z-index: 10;
+	width: 36px;
+	height: 36px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 999px;
+	background: var(--q2-bg-muted);
+	color: var(--q2-text);
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.detail-modal-close:hover {
+	background: var(--q2-accent);
+	color: #fff;
+}
+
+.detail-modal-body h3 {
+	margin-top: 0;
+	padding-right: 2.5rem;
+}
+
+.detail-modal-body p:last-child {
+	margin-bottom: 0;
+}
+
+body.detail-modal-open {
+	overflow: hidden;
+}
+
+@keyframes detail-modal-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes detail-modal-in {
+	from { opacity: 0; transform: translate(-50%, -46%); }
+	to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@media (max-width: 600px) {
+	.detail-modal {
+		width: 94vw;
+		padding: 1.5rem;
+	}
+}
+
+/* Experience section — simple, compact role list on the left; clicking
+   one shows the full write-up on the right (reuses the [data-tabs] JS). */
+.exp-split {
+	display: grid;
+	grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+	gap: 2rem;
+	align-items: start;
+}
+
+@media (max-width: 800px) {
+	.exp-split {
+		grid-template-columns: 1fr;
+	}
+}
+
+.exp-tabs {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 0.9rem;
+	padding-left: 1.5rem;
+}
+
+/* Connecting timeline line down the left edge, like the old exp-timeline
+   dots, but now paired with the clickable role tiles. */
+.exp-tabs::before {
+	content: '';
+	position: absolute;
+	left: 5px;
+	top: 26px;
+	bottom: 26px;
+	width: 2px;
+	background: var(--muted-border-color);
+}
+
+.exp-tab {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.85rem;
+	padding: 0.85rem 1.1rem;
+	border-radius: 0.9rem;
+	border: 1px solid color-mix(in srgb, var(--q2-accent) 40%, transparent);
+	border-left: 3px solid transparent;
+	background: var(--card-background-color);
+	text-align: left;
+	cursor: pointer;
+	color: var(--q2-text);
+	transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exp-tab::before {
+	content: '';
+	position: absolute;
+	left: -1.5rem;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 11px;
+	height: 11px;
+	border-radius: 999px;
+	background: var(--q2-bg-muted);
+	border: 2px solid var(--q2-text-muted);
+	transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exp-tab:hover {
+	border-color: var(--q2-accent);
+	transform: translateY(-1px);
+}
+
+.exp-tab[aria-selected="true"] {
+	border-color: var(--q2-accent);
+	border-left-color: var(--q2-accent);
+	background: color-mix(in srgb, var(--q2-accent) 10%, var(--card-background-color));
+	box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--q2-accent) 40%, transparent);
+}
+
+.exp-tab[aria-selected="true"]::before {
+	background: var(--q2-accent);
+	border-color: var(--q2-accent);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--q2-accent) 20%, transparent);
+}
+
+.exp-tab .exp-logo {
+	margin: 0;
+	width: 42px;
+	height: 42px;
+}
+
+.exp-tab-text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.exp-tab-text strong {
+	font-size: 0.95rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.exp-tab-text small {
+	font-size: 0.78rem;
+	color: var(--q2-text-muted);
+}
+
+.exp-tab-current {
+	display: inline-block;
+	margin-top: 0.15rem;
+	padding: 0.1rem 0.5rem;
+	width: fit-content;
+	border-radius: 999px;
+	background: color-mix(in srgb, #22c55e 16%, transparent);
+	color: #16a34a;
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+:root[data-theme="dark"] .exp-tab-current {
+	color: #4ade80;
+}
+
+.exp-detail {
+	padding: clamp(1.25rem, 3vw, 2rem);
+	border-radius: 1.25rem;
+	background: var(--q2-bg-muted);
+	min-height: 280px;
+}
+
+.exp-detail-panel h3 {
+	margin-top: 0;
+	margin-bottom: 0.35rem;
+}
+
+.exp-detail-panel .exp-period {
+	display: block;
+	margin-bottom: 0.75rem;
+}
+
+.exp-detail-panel .muted {
+	color: var(--muted-color);
+}
+
+.exp-detail-panel .tags {
+	margin: 1rem 0 1.25rem;
+}
+
+.exp-detail-panel .tags .label {
+	background: var(--card-background-color);
+}
+
+/* Two-column detail panel: write-up on the left, a few quick highlights
+   on the right so the wide panel doesn't read as half-empty. */
+.exp-detail-panel {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(190px, 230px);
+	gap: 1.5rem;
+	max-width: 920px;
+}
+
+.exp-detail-main {
+	min-width: 0;
+}
+
+.exp-detail-highlights {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 1.3rem;
+	padding-left: 1.75rem;
+	align-self: start;
+}
+
+/* A soft gradient-fade divider between the write-up and the highlights,
+   instead of a flat border-left or a full boxed-in card. */
+.exp-detail-highlights::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0.2rem;
+	bottom: 0.2rem;
+	width: 1.5px;
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		color-mix(in srgb, var(--q2-accent) 70%, transparent) 15%,
+		color-mix(in srgb, var(--q2-accent) 70%, transparent) 85%,
+		transparent
+	);
+}
+
+.exp-highlight {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.65rem;
+}
+
+.exp-highlight i {
+	flex: none;
+	margin-top: 0.15rem;
+	font-size: 1.05rem;
+	color: var(--q2-accent);
+}
+
+.exp-highlight strong {
+	display: block;
+	font-size: 0.85rem;
+	line-height: 1.3;
+}
+
+.exp-highlight span {
+	display: block;
+	font-size: 0.75rem;
+	color: var(--q2-text-muted);
+	line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+	.exp-detail-panel {
+		grid-template-columns: 1fr;
+	}
+	.exp-detail-highlights {
+		flex-direction: row;
+		flex-wrap: wrap;
+		padding-left: 0;
+		padding-top: 1.3rem;
+	}
+	.exp-detail-highlights::before {
+		left: 0.2rem;
+		right: 0.2rem;
+		top: 0;
+		bottom: auto;
+		width: auto;
+		height: 1.5px;
+		background: linear-gradient(
+			to right,
+			transparent,
+			color-mix(in srgb, var(--q2-accent) 70%, transparent) 15%,
+			color-mix(in srgb, var(--q2-accent) 70%, transparent) 85%,
+			transparent
+		);
+	}
+	.exp-highlight {
+		flex: 1 1 160px;
+	}
+}
+
+/* Richer "feature card" grid — replaces the plain skill-grid pills for
+   sections that felt too sparse (What energizes me / Outside of work). */
+.feature-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+	gap: 1.25rem;
+	margin-top: 1.5rem;
+}
+
+.feature-card {
+	padding: 1.5rem;
+	border-radius: 1.25rem;
+	/* Mixed with transparent (not the muted gray border color) so this
+	   actually reads as blue instead of diluting back to gray. */
+	border: 2px solid color-mix(in srgb, var(--q2-accent) 65%, transparent);
+	background: var(--card-background-color);
+	box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+	transform: translateY(-3px);
+	border-color: var(--q2-accent);
+	box-shadow: 0 20px 40px -18px color-mix(in srgb, var(--q2-accent) 40%, transparent);
+}
+
+.feature-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--q2-accent) 12%, transparent);
+	color: var(--q2-accent);
+	font-size: 1.3rem;
+	margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+	margin: 0 0 0.55rem;
+	font-size: 1.02rem;
+	letter-spacing: 0.005em;
+}
+
+.feature-card p {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.6;
+	color: var(--muted-color);
+}
+
+/* Icon-tile variant of .exp-tab (no photo/logo available — e.g. Technical
+   specialisations), plus a single-column variant of .exp-detail-panel for
+   tab groups that don't have a highlights sidebar. */
+.exp-tab-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	border-radius: 0.6rem;
+	background: color-mix(in srgb, var(--q2-accent) 14%, transparent);
+	color: var(--q2-accent);
+	font-size: 1.15rem;
+	flex: none;
+}
+
+.exp-detail-panel--single {
+	grid-template-columns: 1fr;
+}
+
+/* The generic .form-input rule sets width:100%, which also stretches the
+   captcha's tiny code-entry field to fill the whole remaining row next to
+   the image — cap it back down to something sized for ~6 characters. */
+.form-wrapper .form-data.basic-captcha input.form-input {
+	width: auto;
+	max-width: 140px;
+	flex: 0 0 140px;
+	text-align: center;
+	letter-spacing: 0.1em;
+}
+
+@media (max-width: 480px) {
+	.form-wrapper .form-data.basic-captcha .form-input-wrapper {
+		flex-wrap: wrap;
+	}
+	.form-wrapper .form-data.basic-captcha input.form-input {
+		flex: 1 1 100%;
+		max-width: none;
+	}
+}
+
+.portfolio-contact-card p i {
+	width: 1.1em;
+	color: var(--q2-accent);
+	text-align: center;
+}
+
+/* Education & certificates — one row per credential instead of a plain
+   bullet list, matching the icon-tile language used elsewhere. */
+.credential-list {
+	list-style: none;
+	margin: 1rem 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+}
+
+.credential-item {
+	display: flex;
+	align-items: center;
+	gap: 0.85rem;
+	padding: 0.75rem 0.9rem;
+	border-radius: 0.9rem;
+	background: var(--q2-bg-muted);
+	border: 1px solid color-mix(in srgb, var(--q2-accent) 25%, transparent);
+}
+
+.credential-item > i {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 0.6rem;
+	background: color-mix(in srgb, var(--q2-accent) 14%, transparent);
+	color: var(--q2-accent);
+	font-size: 0.95rem;
+}
+
+.credential-item > div {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	min-width: 0;
+}
+
+.credential-item strong {
+	font-size: 0.88rem;
+	line-height: 1.3;
+}
+
+.credential-item > div span {
+	font-size: 0.78rem;
+	color: var(--q2-text-muted);
+}
+
+.credential-period {
+	margin-left: auto;
+	flex: none;
+	padding-left: 0.75rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.75rem;
+	color: var(--q2-text-muted);
+}
